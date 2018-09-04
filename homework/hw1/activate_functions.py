@@ -9,4 +9,5 @@ def gradient_for_relu(z):
     return z
 
 def softmax(z):
+    # print(np.sum(np.exp(z)))
     return np.exp(z) / np.sum(np.exp(z))

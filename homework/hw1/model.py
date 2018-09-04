@@ -19,7 +19,7 @@ class NeuralNetwork:
         self.c = np.random.randn(self.k, self.d_h)
         self.b2 = np.random.randn(self.k)
     
-    def train(self, train_data, learning_rate=0.1, epochs=100):
+    def train(self, train_data, test_data, learning_rate=0.1, epochs=100):
         """Train the neural network using SGD.
         Args:
             train_data(tuple): x_train(60000, 784) and y_train(60000,)
@@ -29,17 +29,18 @@ class NeuralNetwork:
         X = train_data[0]
         Y = train_data[1]
 
-        avg_epochs = epochs // 4
+        # avg_epochs = epochs // 10  # Should tune this in practice.
+        avg_epochs = epochs // 10
 
         for epoch in range(1, epochs + 1):
             # Learning rate schedule.
             if epoch > avg_epochs:
-                learning_rate *= 0.1
+                learning_rate = 0.01
             elif epoch > 2 * avg_epochs:
-                learning_rate *= 0.01
+                learning_rate = 0.001
             else:
-                learning_rate *= 0.001
-            
+                learning_rate = 0.0001
+           
             # SGD.
             total_correct = 0
             for _ in range(X.shape[0]):
@@ -58,6 +59,10 @@ class NeuralNetwork:
             
             acc = total_correct / np.float(X.shape[0])
             print("epoch {}, training accuracy = {}".format(epoch, acc))
+
+            if epoch % 5 == 0:
+                self.test(test_data)
+
     
     def _forward_step(self, x):
         """Calculate output f and intermediary network values."""
@@ -91,7 +96,7 @@ class NeuralNetwork:
     
     def _predict(self, f):
         return np.argmax(f)
-    
+   
     def test(self, test_data):
         X = test_data[0]
         Y = test_data[1]
