@@ -24,7 +24,7 @@ class NeuralNetwork:
         self.c = np.random.randn(self.k, self.d_h) * math.sqrt(2.0 / self.d_h)
         self.b2 = np.zeros(self.k)
     
-    def train(self, train_data, test_data, learning_rate=0.1, epochs=100):
+    def train(self, train_data, learning_rate=0.1, epochs=100):
         """Train the neural network using SGD.
         Args:
             train_data(tuple): x_train(60000, 784) and y_train(60000,)
@@ -63,10 +63,6 @@ class NeuralNetwork:
             
             acc = total_correct / np.float(X.shape[0])
             print("epoch {}, training accuracy = {}".format(epoch, acc))
-
-            if epoch % 5 == 0:
-                self.test(test_data)
-
     
     def _forward_step(self, x):
         """Calculate output f and intermediary network values."""
