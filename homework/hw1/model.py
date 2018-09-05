@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from random import randint
 from activate_functions import relu, gradient_for_relu, softmax
 
@@ -10,14 +11,18 @@ class NeuralNetwork:
             hidden_units(int): number of hidden units
             classes(int): number of classes in y
         """
+        # Set up dimensions.
         self.d = dimension
         self.d_h = hidden_units
         self.k = classes
 
-        self.w = np.random.randn(self.d_h, self.d)
-        self.b1 = np.random.randn(self.d_h)
-        self.c = np.random.randn(self.k, self.d_h)
-        self.b2 = np.random.randn(self.k)
+        # Xavier initialization, making sure var(in) = var(out).
+        # For ReLU sepecifically, use He init which is a modified version of Xavier.
+        np.random.seed(0)
+        self.w = np.random.randn(self.d_h, self.d) * math.sqrt(2.0 / self.d)
+        self.b1 = np.zeros(self.d_h)
+        self.c = np.random.randn(self.k, self.d_h) * math.sqrt(2.0 / self.d_h)
+        self.b2 = np.zeros(self.k)
     
     def train(self, train_data, test_data, learning_rate=0.1, epochs=100):
         """Train the neural network using SGD.
@@ -67,6 +72,7 @@ class NeuralNetwork:
         """Calculate output f and intermediary network values."""
         z = np.matmul(self.w, x) + self.b1
         h = relu(z)
+        # h = sigmoid(z)
         u = np.matmul(self.c, h) + self.b2
         f = softmax(u)
         return z, h, u, f

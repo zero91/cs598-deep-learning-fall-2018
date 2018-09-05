@@ -9,12 +9,11 @@ def main():
     train_data, test_data = data[:2], data[2:]
 
     # Init model.
-    nn = NeuralNetwork(train_data[0].shape[1], hidden_units=200) #50, 40, 100
-
+    nn = NeuralNetwork(train_data[0].shape[1], hidden_units=100)
 
     # Train.
     print("training model...")
-    nn.train(train_data, test_data, learning_rate=0.1, epochs=100)
+    nn.train(train_data, test_data, learning_rate=0.1, epochs=30)
 
     # Test
     print("testing model...")
