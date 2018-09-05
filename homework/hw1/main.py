@@ -13,7 +13,7 @@ def main():
 
     # Train.
     print("training model...")
-    nn.train(train_data, test_data, learning_rate=0.1, epochs=30)
+    nn.train(train_data, test_data, learning_rate=0.1, epochs=25)
 
     # Test
     print("testing model...")
