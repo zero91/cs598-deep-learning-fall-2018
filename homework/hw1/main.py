@@ -9,7 +9,7 @@ def main():
     train_data, test_data = data[:2], data[2:]
 
     # Init model.
-    nn = NeuralNetwork(train_data[0].shape[1], hidden_units=100) #50, 40, 
+    nn = NeuralNetwork(train_data[0].shape[1], hidden_units=200) #50, 40, 100
 
 
     # Train.

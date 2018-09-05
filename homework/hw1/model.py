@@ -29,8 +29,7 @@ class NeuralNetwork:
         X = train_data[0]
         Y = train_data[1]
 
-        # avg_epochs = epochs // 10  # Should tune this in practice.
-        avg_epochs = epochs // 10
+        avg_epochs = epochs // 10  # Should tune this in practice.
 
         for epoch in range(1, epochs + 1):
             # Learning rate schedule.
@@ -98,6 +97,10 @@ class NeuralNetwork:
         return np.argmax(f)
    
     def test(self, test_data):
+        """Test the trained model.
+        Args:
+            test_data(tuple): x_test(10000, 784) and y_test(10000,)
+        """
         X = test_data[0]
         Y = test_data[1]
         total_correct = 0
