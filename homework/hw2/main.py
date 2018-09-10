@@ -1,4 +1,6 @@
 from io_tools import load_data
+import math
+from model import ConvolutionalNeuralNetwork
 
 def main():
     """High level pipeline."""
@@ -6,18 +8,18 @@ def main():
     # Load dataset.
     data = load_data("data/MNISTdata.hdf5")
     train_data, test_data = data[:2], data[2:]
-    print(train_data[0].shape, test_data[0].shape)
+    input_dim = int(math.sqrt(train_data[0].shape[1]))  # 28.
 
     # Init model.
-    # nn = NeuralNetwork(train_data[0].shape[1], hidden_units=100)
+    cnn = ConvolutionalNeuralNetwork(input_dim)
 
-    # # Train.
-    # print("training model...")
-    # nn.train(train_data, learning_rate=0.1, epochs=25)
+    # Train.
+    print("training model...")
+    cnn.train(train_data, learning_rate=0.1, epochs=25)
 
-    # # Test
-    # print("testing model...")
-    # nn.test(test_data)
+    # Test
+    print("testing model...")
+    cnn.test(test_data)
 
 if __name__ == "__main__":
     main()
