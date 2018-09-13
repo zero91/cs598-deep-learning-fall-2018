@@ -1,38 +1,45 @@
 import numpy as np
+import time
+from math import sqrt
 from random import randint
 from scipy.signal import convolve2d
 from activate_functions import relu, gradient_for_relu, softmax
 
 class ConvolutionalNeuralNetwork:
-    def __init__(self, input_dim, num_classes=10, filter_size=3, stride=1, padding=0, num_filters=1):
+    def __init__(self, input_dim, num_classes=10, filter_size=3, stride=1, padding=0, num_channels=1):
         """Simple CNN with 1 filter (#activation maps=1)"""
         self.d = input_dim
         self.k = num_classes
         self.filter_size = filter_size
         self.s = stride
         self.p = padding
-        self.n_filters = num_filters
+        self.c = num_channels
 
         self.out_dim = self.d - self.filter_size + 1
 
-        self.filter = np.random.randn(self.filter_size, self.filter_size) * 0.01
-        self.w = np.random.rand(self.k, self.out_dim, self.out_dim) * 0.01
+        self.filter = np.random.randn(self.filter_size, self.filter_size) * sqrt(2.0 / (input_dim * input_dim))
+        self.w = np.random.rand(self.k, self.out_dim, self.out_dim) * sqrt(2.0 / (input_dim * input_dim))
         self.b = np.zeros(self.k)
     
     def train(self, train_data, learning_rate=0.1, epochs=100):
         X = train_data[0]
         Y = train_data[1]
 
-        avg_epochs = epochs // 10  # Should tune this in practice.
+        # avg_epochs = epochs // 10  # Should tune this in practice.
+        epoch_limit = 7
 
         for epoch in range(1, epochs + 1):
+            start_time = time.time()
+
             # Learning rate schedule.
-            if epoch > avg_epochs:
-                learning_rate = 0.01
-            elif epoch > 2 * avg_epochs:
-                learning_rate = 0.001
+            if epoch <= epoch_limit:
+                learning_rate = learning_rate
+            elif epoch > epoch_limit:
+                learning_rate = 0.00001
+            elif epoch > 2 * epoch_limit:
+                learning_rate = 0.000001
             else:
-                learning_rate = 0.0001
+                learning_rate = 0.0000001
            
             # SGD.
             total_correct = 0
@@ -52,6 +59,10 @@ class ConvolutionalNeuralNetwork:
             
             acc = total_correct / np.float(X.shape[0])
             print("epoch {}, training accuracy = {}".format(epoch, acc))
+
+            # Record time.
+            end_time = time.time()
+            print("--- %s seconds ---" % (end_time - start_time))
     
     def _forward_step(self, x):
         # Reshape x to a matrix.
@@ -60,11 +71,7 @@ class ConvolutionalNeuralNetwork:
         # Forward step.
         z = convolve2d(x, self.filter, mode="valid")
         h = relu(z)
-
-        u = np.zeros(self.k)
-        for i in range(self.k):
-            u[i] = np.sum(np.multiply(self.w[i], h))
-        u += self.b
+        u = np.sum(np.multiply(self.w, h), axis=(1,2)) + self.b
         f = softmax(u)
 
         return z, h, u, f

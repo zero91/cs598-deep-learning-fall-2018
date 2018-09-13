@@ -15,7 +15,7 @@ def main():
 
     # Train.
     print("training model...")
-    cnn.train(train_data, learning_rate=0.1, epochs=25)
+    cnn.train(train_data, learning_rate=0.0001, epochs=25)
 
     # Test
     print("testing model...")
