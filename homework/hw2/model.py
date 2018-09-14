@@ -61,8 +61,7 @@ class ConvolutionalNeuralNetwork:
             #     learning_rate = 0.00001
             # else:
             #     learning_rate = 0.000001
-
-           
+      
             # SGD.
             total_correct = 0
             for _ in range(X.shape[0]):
