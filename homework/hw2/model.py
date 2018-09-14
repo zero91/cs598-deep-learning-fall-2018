@@ -2,12 +2,12 @@ import numpy as np
 import time
 from math import sqrt
 from random import randint
-from scipy.signal import convolve2d
 from activate_functions import relu, gradient_for_relu, softmax
 from convolve import ConvolveOps
 
 class ConvolutionalNeuralNetwork:
-    def __init__(self, input_dim, num_classes=10, filter_size=3, stride=1, padding=0, num_channels=1):
+    def __init__(self, input_dim, num_classes=10, filter_size=3, 
+                 stride=1, padding=0, num_channels=1):
         """Simple CNN with 1 filter (#activation maps=1)"""
         self.d = input_dim
         self.k = num_classes
@@ -18,13 +18,15 @@ class ConvolutionalNeuralNetwork:
 
         self.out_dim = self.d - self.filter_size + 1
 
-        self.filter = np.random.randn(self.filter_size, self.filter_size) * sqrt(2.0 / (input_dim * input_dim))
-        self.w = np.random.rand(self.k, self.out_dim, self.out_dim) * sqrt(2.0 / (input_dim * input_dim))
+        self.filter = np.random.randn(self.filter_size, self.filter_size, self.c) * \
+                     sqrt(2.0 / (input_dim * input_dim))
+        self.w = np.random.rand(self.k, self.out_dim, self.out_dim, self.c) * \
+                     sqrt(2.0 / (input_dim * input_dim))
         self.b = np.zeros(self.k)
     
     def train(self, X, Y, learning_rate=0.1, epochs=100):
         # avg_epochs = epochs // 10  # Should tune this in practice.
-        epoch_limit = 7
+        epoch_limit = 15
 
         for epoch in range(1, epochs + 1):
             start_time = time.time()
@@ -67,13 +69,19 @@ class ConvolutionalNeuralNetwork:
         x = self._reshape_x_to_matrix(x)
 
         # Forward step.
-        # z = convolve2d(x, self.filter, mode="valid")
-        # z = my_convolve(x, self.filter)
         convolve = ConvolveOps(x, self.filter)
         z = convolve.convolve(optimize=True)
 
         h = relu(z)
-        u = np.sum(np.multiply(self.w, h), axis=(1,2)) + self.b
+
+        u = np.zeros(self.k)
+        for depth_slice in range(self.c):
+            u += np.sum(
+                    np.multiply(self.w[:, :, :, depth_slice], h[:, :, depth_slice]), 
+                    axis=(1,2)
+                    ) \
+                 + self.b
+
         f = softmax(u)
 
         return z, h, u, f
@@ -89,19 +97,17 @@ class ConvolutionalNeuralNetwork:
         gradient_u = - (e_y - f)
         gradient_b = gradient_u
 
-        gradient_w = np.zeros((self.k, self.out_dim, self.out_dim))
+        gradient_w = np.zeros((self.k, self.out_dim, self.out_dim, self.c))
         for i in range(self.k):
             gradient_w[i] = gradient_u[i] * h
-        
-        grad_u_times_w = np.multiply(np.reshape(gradient_u, (self.k, 1, 1)), self.w)
+
+        grad_u_times_w = np.multiply(np.reshape(gradient_u, (self.k, 1, 1, 1)), self.w)
         delta = grad_u_times_w.sum(axis=0)
+
         relu_prime = gradient_for_relu(z)
-        # gradient_filter = convolve2d(x, np.multiply(relu_prime, delta), mode="valid")
-        # gradient_filter = my_convolve(x, np.multiply(relu_prime, delta))
+
         convolve = ConvolveOps(x, np.multiply(relu_prime, delta))
         gradient_filter = convolve.convolve(optimize=True)
-
-        # print(gradient_filter.shape)
 
         return gradient_b, gradient_w, gradient_filter
     
