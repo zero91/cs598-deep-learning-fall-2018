@@ -111,29 +111,50 @@ testing accuracy = 0.982
 
 
 
+## Hyperparameters
+
+The hyperparameters are configured as:
+
+|  Hyperparameters   | Value |
+| :----------------: | :---: |
+|   Learning rate    | 0.001 |
+|  Number of epochs  |  40   |
+|    Filter size     |   7   |
+| Number of channels |  32   |
+
+
+
 ## Usage
 
 Type `python3 main.py` in terminal.
 
 > Note that the default path for the dataset is `"data/MNISTdata.hdf5"`. If a different path is used, please change the input path to the `load_data` function in `main.py`.
 
+To run in debug mode which only trains the model using a smaller part of the dataset, set the `DEBUG` variable to `1`.
+
 
 
 ## Implementation
 
-The implementation is separated into four files, namely:
+The implementation is separated into five files, namely:
 
-- `main.py`: the main file to execute, which contains the high level pipeline of the overall implementation, including loading the dataset, initializing the model, training and testing.
+- `main.py`: the main file to execute, which contains the high level pipeline of the overall implementation, including configuring the hyperparameters, loading the dataset, initializing the model, training and testing.
 
-- `model.py`: contains the architecture of the neural network with a single hidden layer. The model is implemented as a `NeuralNetwork` class which supports weight initialization, training and testing. There are mainly two public functions that can be called by the `NeuralNetwork` object:
+- `model.py`: contains the architecture of the Convolutional Neural Network with one hidden layer and multiple channels. The model is implemented as a `ConvolutionalNeuralNetwork` class which supports weight initialization, training and testing. There are mainly two public functions that can be called by the ``ConvolutionalNeuralNetwork`` object:
 
-  - `train`: train the neural network on the training dataset using SGD.
+  - `train`: train the CNN on the training dataset using SGD.
   - `test`: test the trained model on the testing dataset.
 
-  The other functions, i.e., `_forward_step`, `_backward_step`, `_update_weights` and `_predict` are private functions which help with the training and testing process.
+  The other functions, i.e., `_forward_step`, `_backward_step`, `_update_weights`, `_predict` and `_reshape_x_to_matrix` are private functions which help with the training and testing process. For more details, please refer to the code docstrings.
+
+- `convolve.py`: contains a `ConvolveOps` class which implements tools to perform convolution operations. To perform convolution, call the `convolve` method. Two kinds of convolution operations have been implemented:
+
+  - `_convolve_brute_force`: brute force convolution operation using for loops
+  - `_convolve_optimize`: optimized convolution operation using matrix multiplication whic achieved a speedup of ~20 times.
 
 - `io_tools.py`: contains tools to load the MNIST dataset.
 
 - `activate_functions.py`: implements activation functions for later use, including ReLU and softmax, as well as the gradient for ReLU.
+
 
 
