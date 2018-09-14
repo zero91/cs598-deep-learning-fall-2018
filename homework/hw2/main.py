@@ -2,12 +2,12 @@ from io_tools import load_data
 import math
 from model import ConvolutionalNeuralNetwork
 
-DEBUG = 1
+DEBUG = 0
 
 # Hyperparameters.
-FILTER_SIZE = 3
-NUM_CHANNELS = 3
-LR = 0.0001
+FILTER_SIZE = 7
+NUM_CHANNELS = 32
+LR = 0.001
 EPOCHS = 40
 
 def main():

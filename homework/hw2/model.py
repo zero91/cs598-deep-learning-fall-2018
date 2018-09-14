@@ -30,6 +30,7 @@ class ConvolutionalNeuralNetwork:
         self.out_dim = self.d - self.filter_size + 1
 
         # Init weights using Xavier (He's) initialization.
+        np.random.seed(0)
         self.filter = np.random.randn(self.filter_size, self.filter_size, self.c) * \
                      sqrt(2.0 / (input_dim * input_dim))
         self.w = np.random.rand(self.k, self.out_dim, self.out_dim, self.c) * \
@@ -46,20 +47,21 @@ class ConvolutionalNeuralNetwork:
             epochs(int)
         """
 
-        epoch_limit = 15  # For learning rate scheduling.
+        # epoch_limit = 20  # For learning rate scheduling.
 
         for epoch in range(1, epochs + 1):
             start_time = time.time()
 
             # Learning rate schedule.
-            if epoch <= epoch_limit:
-                learning_rate = learning_rate
-            elif epoch > epoch_limit:
-                learning_rate = 0.00001
-            elif epoch > 2 * epoch_limit:
-                learning_rate = 0.000001
-            else:
-                learning_rate = 0.0000001
+            # if epoch <= epoch_limit:
+            #     learning_rate = learning_rate
+            # elif epoch > epoch_limit:
+            #     learning_rate = 0.0001
+            # elif epoch > 2 * epoch_limit:
+            #     learning_rate = 0.00001
+            # else:
+            #     learning_rate = 0.000001
+
            
             # SGD.
             total_correct = 0
