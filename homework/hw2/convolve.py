@@ -2,6 +2,12 @@ import numpy as np
 
 class ConvolveOps:
     def __init__(self, x, filter_):
+        """Tools to perform convolution operations.
+        Arg:
+            x(in_dim, in_dim): input image
+            filter_(filter_size, filter_size, num_channels): stack of filters
+        """
+
         self.in_dim = x.shape[0]
         self.filter_size = filter_.shape[0]
         self.c = filter_.shape[2]
@@ -12,19 +18,25 @@ class ConvolveOps:
         self.x = x
         self.filter = filter_
 
+
     def convolve(self, optimize=True):
         """Perform convolution between the input image and the filter.
         Args:
             optimize(boolean): choose to use the optimized convolution op or not.
             the brute force operation can be used for debugging.
+        Return:
+            feature_map(out_dim, out_dim, num_channels): stack of feature maps
         """
+
         if optimize:
             return self._convolve_optimize()
         else:
             return self._convolve_brute_force()
 
+
     def _convolve_brute_force(self):
         """Brute force convolution operation, assuming that stride=1, padding=0."""
+
         for depth_slice in range(self.c):
             for i in range(self.out_dim):
                 for j in range(self.out_dim):
@@ -35,10 +47,12 @@ class ConvolveOps:
         
         return self.feature_map
     
+
     def _convolve_optimize(self):
         """Optimized convolution operation using matrix multiplication.
-        Achieved a speedup of ~10 times.
+        Achieved a speedup of ~20 times.
         """
+
         x_col = self._image_to_col()
         filter_row = self._filter_to_row()
 
@@ -50,6 +64,7 @@ class ConvolveOps:
 
         return self.feature_map
     
+
     def _image_to_col(self):
         """Stretch the local regions in the input image into columns.
         Original dimension of x: (d, d)
@@ -57,6 +72,7 @@ class ConvolveOps:
                 i.e., (filter_size * filter_size, out_dim * out_dim)
                 where c is the number of channels
         """
+
         x_col = np.zeros((self.filter_size * self.filter_size, 
                           self.out_dim * self.out_dim))
         index = 0
@@ -67,6 +83,7 @@ class ConvolveOps:
 
         return x_col
     
+
     def _filter_to_row(self):
         """Stretch the weights in the filter into rows.
         Original dimension of filter: (filter_size, filter_size)
@@ -74,6 +91,7 @@ class ConvolveOps:
                 i.e., (c, filter_size * filter_size)
                 where c is the number of channels
         """
+
         filter_row = np.zeros((self.c, self.filter_size * self.filter_size))
         for i in range(self.c):
             filter_row[i] = self.filter[:, :, i].T.flatten()

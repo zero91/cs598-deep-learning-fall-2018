@@ -4,6 +4,12 @@ from model import ConvolutionalNeuralNetwork
 
 DEBUG = 1
 
+# Hyperparameters.
+FILTER_SIZE = 3
+NUM_CHANNELS = 3
+LR = 0.0001
+EPOCHS = 40
+
 def main():
     """High level pipeline."""
 
@@ -22,11 +28,18 @@ def main():
     input_dim = int(math.sqrt(x_train.shape[1]))  # 28.
 
     # Init model.
-    cnn = ConvolutionalNeuralNetwork(input_dim)
+    cnn = ConvolutionalNeuralNetwork(input_dim, filter_size=FILTER_SIZE, 
+                                     num_channels=NUM_CHANNELS)
 
     # Train.
     print("training model...")
-    cnn.train(x_train, y_train, learning_rate=0.0001, epochs=25)
+    print("""hyperparameters:
+             learning rate = {}
+             epochs = {}
+             filter size = {}
+             num of channels = {}"""
+            .format(LR, EPOCHS, FILTER_SIZE, NUM_CHANNELS))
+    cnn.train(x_train, y_train, learning_rate=LR, epochs=EPOCHS)
 
     # Test
     print("testing model...")
