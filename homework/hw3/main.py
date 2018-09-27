@@ -32,12 +32,6 @@ trials = [
     [0.001, 70],
     [0.001, 15]]
 
-# trial 0: acc 0.79430
-# trial 1: acc 0.85200
-# trial 2: acc 0.87988 at epoch 86
-# trial 3: acc 0.92969 at epoch 86
-# trial 4: acc 0.93092 at epoch 18
-
 if (len(sys.argv) == 2):
     trial_number = int(sys.argv[1])
 else:
