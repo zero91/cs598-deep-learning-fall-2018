@@ -3,8 +3,8 @@ import torch.backends.cudnn as cudnn
 
 from data_tools import data_loader_and_transformer
 from model import DeepCNN
-from train import train_single_epoch
-from test import test_single_epoch
+from train import train
+from test import test
 from utils import load_checkpoint
 
 import matplotlib.pyplot as plt
@@ -21,7 +21,15 @@ trails = [
     [0.01, 50],
     [0.001, 50],
     [0.01, 100],
-    [0.001, 100]]
+    [0.001, 100],
+    [0.001, 70],
+    [0.001, 15]]
+
+# trail 0: acc 0.79430
+# trail 1: acc 0.85200
+# trail 2: acc 0.87988 at epoch 86
+# trail 3: acc 0.92969 at epoch 86
+# trail 4: acc 0.93092 at epoch 18
 
 if (len(sys.argv) == 2):
     trail_number = int(sys.argv[1])
@@ -79,31 +87,32 @@ def main():
         print("*** Loading checkpoint...")
         start_epoch, best_acc = load_checkpoint(cnn)
 
-    # Train and validate.
+    # Training.
     print("*** Start training on device {}...".format(device))
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(cnn.parameters(), lr=LR)
+    train(
+        cnn,
+        criterion,
+        optimizer,
+        best_acc,
+        start_epoch,
+        EPOCHS,
+        train_data_loader,
+        device,
+        lr_schedule=False,
+        debug=DEBUG
+    )
 
-    for epoch in range(start_epoch, EPOCHS):
-        train_single_epoch(
-            cnn,
-            criterion,
-            optimizer,
-            epoch,
-            train_data_loader,
-            device,
-            lr_schedule=False,
-            debug=True
-        )
-        best_acc = test_single_epoch(
-            cnn,
-            criterion,
-            best_acc,
-            epoch,
-            test_data_loader,
-            device,
-            debug=True
-        )
+    # Testing.
+    print("*** Start testing...")
+    test(
+        cnn,
+        criterion,
+        test_data_loader,
+        device,
+        debug=DEBUG
+    )
     
     print("*** Congratulations! You've got an amazing model now :)")
 
