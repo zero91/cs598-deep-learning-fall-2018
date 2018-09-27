@@ -12,10 +12,15 @@ from train import train
 from test import test
 from utils import load_checkpoint
 
-# Configurations.
+# Set to True if you have checkpoints available and want to resume from it
 LOAD_CHECKPOINT = False
+
+# Set to True to get some insights of the data
 SHOW_SAMPLE_IMAGE = False
+
+# Set to True to run in a debug mode which uses less data
 DEBUG = False
+
 DATA_PATH = "./data"
 
 # Hyperparameters.
@@ -36,7 +41,7 @@ trials = [
 if (len(sys.argv) == 2):
     trial_number = int(sys.argv[1])
 else:
-    trial_number = 1
+    trial_number = 5
 LR = trials[trial_number][0]
 EPOCHS = trials[trial_number][1]
 
