@@ -1,14 +1,16 @@
 import torch
 import torch.backends.cudnn as cudnn
 
+import matplotlib.pyplot as plt
+import sys
+import numpy as np
+import random
+
 from data_tools import data_loader_and_transformer
 from model import DeepCNN
 from train import train
 from test import test
 from utils import load_checkpoint
-
-import matplotlib.pyplot as plt
-import sys
 
 # Configurations.
 LOAD_CHECKPOINT = False
@@ -44,6 +46,12 @@ def main():
     Usage: run "python3 main.py trial_num"
     such as "python3 main.py 1"
     """
+
+    # Set seed.
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    np.random.seed(0)
+    random.seed(0)
 
     # Load data.
     print("*** Performing data augmentation...")
