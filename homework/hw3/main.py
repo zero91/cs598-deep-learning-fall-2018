@@ -17,7 +17,7 @@ DEBUG = False
 DATA_PATH = "./data"
 
 # Hyperparameters.
-trails = [
+trials = [
     [0.01, 50],
     [0.001, 50],
     [0.01, 100],
@@ -25,23 +25,23 @@ trails = [
     [0.001, 70],
     [0.001, 15]]
 
-# trail 0: acc 0.79430
-# trail 1: acc 0.85200
-# trail 2: acc 0.87988 at epoch 86
-# trail 3: acc 0.92969 at epoch 86
-# trail 4: acc 0.93092 at epoch 18
+# trial 0: acc 0.79430
+# trial 1: acc 0.85200
+# trial 2: acc 0.87988 at epoch 86
+# trial 3: acc 0.92969 at epoch 86
+# trial 4: acc 0.93092 at epoch 18
 
 if (len(sys.argv) == 2):
-    trail_number = int(sys.argv[1])
+    trial_number = int(sys.argv[1])
 else:
-    trail_number = 1
-LR = trails[trail_number][0]
-EPOCHS = trails[trail_number][1]
+    trial_number = 1
+LR = trials[trial_number][0]
+EPOCHS = trials[trial_number][1]
 
 
 def main():
     """High level pipelines.
-    Usage: run "python3 main.py num"
+    Usage: run "python3 main.py trial_num"
     such as "python3 main.py 1"
     """
 
