@@ -5,6 +5,17 @@ def test_single_epoch(net, criterion,
                       best_acc, curt_epoch,
                       test_data_loader, device,
                       debug=False):
+    """Testing setup for a single epoch
+    Args:
+        net(class.DeepCNN)
+        criterion(torch.nn.CrossEntropyLoss)
+        best_acc(float): best accuracy until the current epoch
+        curt_epoch(int): current training epoch
+        test_data_loader(iterator)
+        device(str): 'cpu' or 'cuda'
+        debug(bool): whether to use a debug mode
+    """
+
     # Set to test mode.
     net.eval()
 

@@ -21,6 +21,8 @@ LR = 0.001
 EPOCHS = 50
 
 def main():
+    """High level pipelines"""
+
     # Load data.
     print("*** Performing data augmentation...")
     train_data_loader, test_data_loader = data_loader_and_transformer(DATA_PATH)

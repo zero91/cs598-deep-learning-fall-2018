@@ -7,6 +7,17 @@ def train_single_epoch(net, criterion, optimizer,
                        train_data_loader, device,
                        lr_schedule=False,
                        debug=False):
+    """Training setup for a single epoch
+    Args:
+        net(class.DeepCNN)
+        criterion(torch.nn.CrossEntropyLoss)
+        optimizer(torch.optim.Adam)
+        curt_epoch(int): current training epoch
+        train_data_loader(iterator)
+        device(str): 'cpu' or 'cuda'
+        lr_schedule(bool): whether to perform leanring rate scheduling
+        debug(bool): whether to use a debug mode
+    """
 
     # Set to train mode.
     net.train()
