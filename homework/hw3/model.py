@@ -56,8 +56,3 @@ class DeepCNN(nn.Module):
                 in_channels = out_channels
 
         return nn.Sequential(*layers)
-
-
-        
-
-
