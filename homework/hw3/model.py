@@ -3,7 +3,9 @@ import torch.nn as nn
 
 class DeepCNN(nn.Module):
     def __init__(self):
-        """Deep CNN based on VGG16"""
+        """Deep CNN model based on VGG16
+        See the original paper: https://arxiv.org/abs/1409.1556
+        """
 
         super(DeepCNN, self).__init__()
         self.cnov = self._add_conv_layers()
@@ -13,12 +15,20 @@ class DeepCNN(nn.Module):
         )
     
     def forward(self, x):
+        """Forward step which will be called directly
+        by PyTorch
+        """
+
         x = self.cnov(x)
-        x = x.view(x.shape[0], -1)  # Reshape tensor
+
+        # Reshape tensor to match the fc dimensions.
+        x = x.view(x.shape[0], -1)
         x = self.fc(x)
+
         return x
 
     def _add_conv_layers(self):
+        # Network structures for CONV block and POOL block.
         out_channels_list = [
             64, 64, 'pool',
             128, 128, 'pool',
@@ -30,6 +40,7 @@ class DeepCNN(nn.Module):
         layers = []
         in_channels = 3
 
+        # Build.
         for out_channels in out_channels_list:
             if out_channels == 'pool':
                 layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
