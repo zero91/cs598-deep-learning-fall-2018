@@ -4,7 +4,7 @@ import torch.nn as nn
 class DeepCNN(nn.Module):
     def __init__(self):
         """Deep CNN based on VGG16"""
-        
+
         super(DeepCNN, self).__init__()
         self.cnov = self._add_conv_layers()
         self.fc = nn.Sequential(
@@ -43,8 +43,7 @@ class DeepCNN(nn.Module):
                 layers.append(nn.BatchNorm2d(out_channels))
                 layers.append(nn.ReLU(inplace=True))
                 in_channels = out_channels
-        
-        layers.append(nn.AvgPool2d(kernel_size=1, stride=1))
+
         return nn.Sequential(*layers)
 
 
