@@ -1,5 +1,4 @@
 import torch
-import torch.optim as optim
 import torch.backends.cudnn as cudnn
 
 from data_tools import data_loader_and_transformer
@@ -9,19 +8,34 @@ from test import test_single_epoch
 from utils import load_checkpoint
 
 import matplotlib.pyplot as plt
+import sys
 
 # Configurations.
 LOAD_CHECKPOINT = False
 SHOW_SAMPLE_IMAGE = False
-DEBUG = True
+DEBUG = False
 DATA_PATH = "./data"
 
 # Hyperparameters.
-LR = 0.001
-EPOCHS = 50
+trails = [
+    [0.01, 50],
+    [0.001, 50],
+    [0.01, 100],
+    [0.001, 100]]
+
+if (len(sys.argv) == 2):
+    trail_number = int(sys.argv[1])
+else:
+    trail_number = 1
+LR = trails[trail_number][0]
+EPOCHS = trails[trail_number][1]
+
 
 def main():
-    """High level pipelines"""
+    """High level pipelines.
+    Usage: run "python3 main.py num"
+    such as "python3 main.py 1"
+    """
 
     # Load data.
     print("*** Performing data augmentation...")
@@ -68,7 +82,7 @@ def main():
     # Train and validate.
     print("*** Start training on device {}...".format(device))
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = optim.Adam(cnn.parameters(), lr=LR)
+    optimizer = torch.optim.Adam(cnn.parameters(), lr=LR)
 
     for epoch in range(start_epoch, EPOCHS):
         train_single_epoch(

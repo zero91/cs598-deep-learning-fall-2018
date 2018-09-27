@@ -4,6 +4,7 @@ import torch.nn as nn
 class DeepCNN(nn.Module):
     def __init__(self):
         """Deep CNN based on VGG16"""
+        
         super(DeepCNN, self).__init__()
         self.cnov = self._add_conv_layers()
         self.fc = nn.Sequential(

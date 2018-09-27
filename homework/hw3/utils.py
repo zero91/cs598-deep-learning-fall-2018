@@ -27,4 +27,4 @@ def save_checkpoint(net, epoch, best_acc):
     if not os.path.isdir('checkpoints'):
         os.mkdir('checkpoints')
     
-    torch.save(state, 'model_state.pt')
+    torch.save(state, 'checkpoints/model_state.pt')
