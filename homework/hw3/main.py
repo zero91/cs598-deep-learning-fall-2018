@@ -5,6 +5,8 @@ import torch.backends.cudnn as cudnn
 from data_tools import data_loader_and_transformer
 from model import DeepCNN
 from train import train_single_epoch
+from test import test_single_epoch
+from utils import load_checkpoint
 
 import matplotlib.pyplot as plt
 
@@ -12,7 +14,7 @@ import matplotlib.pyplot as plt
 LOAD_CHECKPOINT = False
 SHOW_SAMPLE_IMAGE = False
 DEBUG = True
-PATH = "./data"
+DATA_PATH = "./data"
 
 # Hyperparameters.
 LR = 0.001
@@ -21,7 +23,7 @@ EPOCHS = 50
 def main():
     # Load data.
     print("*** Performing data augmentation...")
-    train_data_loader, test_data_loader = data_loader_and_transformer(PATH)
+    train_data_loader, test_data_loader = data_loader_and_transformer(DATA_PATH)
 
     # Load sample image.
     if SHOW_SAMPLE_IMAGE:
@@ -51,16 +53,17 @@ def main():
     # print(cnn)
     cnn = cnn.to(device)
     if device == 'cuda':
-        net = torch.nn.DataParallel(cnn)
+        cnn = torch.nn.DataParallel(cnn)
         cudnn.benchmark = True
     
     # Load checkpoint.
     start_epoch = 0
+    best_acc = 0
     if LOAD_CHECKPOINT:
         print("*** Loading checkpoint...")
+        start_epoch, best_acc = load_checkpoint(cnn)
 
-
-    # Train.
+    # Train and validate.
     print("*** Start training on device {}...".format(device))
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = optim.Adam(cnn.parameters(), lr=LR)
@@ -76,10 +79,17 @@ def main():
             lr_schedule=False,
             debug=True
         )
-
-
-
-
+        best_acc = test_single_epoch(
+            cnn,
+            criterion,
+            best_acc,
+            epoch,
+            test_data_loader,
+            device,
+            debug=True
+        )
+    
+    print("*** Congratulations! You've got an amazing model now :)")
 
 if __name__=="__main__":
     main()

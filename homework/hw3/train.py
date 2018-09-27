@@ -45,6 +45,6 @@ def train_single_epoch(net, criterion, optimizer,
         total_samples += labels.shape[0]
         total_correct += predict_label.eq(labels.long()).float().sum().item()
         accuracy = total_correct / total_samples
-        print('[epoch: %d, batch: %d] loss: %.3f, accuracy: %.5f' %
+        print('Training [epoch: %d, batch: %d] loss: %.3f, accuracy: %.5f' %
                 (curt_epoch + 1, batch_index + 1, 
                 running_loss / (batch_index + 1), accuracy))
