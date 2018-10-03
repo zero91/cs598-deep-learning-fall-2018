@@ -1,3 +1,4 @@
+------
 # Fall 2018 IE534/CS598:  HW3
 
 **Name**: Ziyu Zhou, 
@@ -72,6 +73,8 @@ The model is a deep CNN based on VGG16 with some modifications. It contains 18 l
 * The _POOL_ block contains a max pooling layer
 * The _FC_ block contains a dropout layer and a fully connected layer
 
+The model is trained with ADAM optimizer.
+
 
 
 | Layer No. | Layer Type | Filter Size \| Padding \| Stride | Input \| Output Channels |
@@ -121,8 +124,8 @@ trials = [
 See the file structure:
 
 ```
-├── data_tools.py			# Tools to load the CIFAR10 dataset and perform data augmentation
-├── main.py					# Major file to execute, containing high level pipelines
+├── data_tools.py			# Load the dataset and perform data augmentation
+├── main.py					# Major file to execute
 ├── model.py				# Model architecture implementation
 ├── test.py					# Model testing
 ├── train.py				# Model training
