@@ -65,7 +65,7 @@ Please refer to the model architecture section for the filter size and number of
 
 
 
-##Model Architecture
+## Model Architecture
 
 The model is a deep CNN based on VGG16 with some modifications. It contains 18 layers, where each layer is either a *CONV* block or a *POOL*block, except that the last layer is a _FC_ block.
 
