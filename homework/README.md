@@ -1,6 +1,6 @@
 # Homework / MP Solutions for CS598 / IE 534
 
-## Homework list
+## Homework
 
 * HW1: [Train a perceptron network from scratch for MNIST dataset](hw1/README.md)
 * HW2: [Train a multi-channel CNN from scratch for MNIST dataset](hw2/README.md)
@@ -14,6 +14,7 @@
     ```
 2. Mount the remote file system into your local machine
     > Note: on Bluewaters, this approach works much better than `scp`.
+    
     At your local machine
     ```
     mkdir <local-path>
