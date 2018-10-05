@@ -12,36 +12,32 @@ from train import train
 from test import test
 from utils import load_checkpoint
 
-# Set to True if you have checkpoints available and want to resume from it
-LOAD_CHECKPOINT = False
+# # Set to True if you have checkpoints available and want to resume from it
+# LOAD_CHECKPOINT = False
 
-# Set to True to get some insights of the data
-SHOW_SAMPLE_IMAGE = True
+# # Set to True to get some insights of the data
+# SHOW_SAMPLE_IMAGE = True
 
-# Set to True to run in a debug mode which uses less data
-DEBUG = False
+# # Set to True to run in a debug mode which uses less data
+# DEBUG = False
 
-DATA_PATH = "./data"
+# DATA_PATH = "./data"
 
-# Hyperparameters.
-trials = [
-    [0.01, 50],
-    [0.001, 50],
-    [0.01, 100],
-    [0.001, 100],
-    [0.001, 30],
-    [0.001, 15]]
 
-# acc: 0.62430
-# Hyperparameters: LR = 0.001, EPOCHS = 30, LR_SCHEDULE = True
+import argparse
 
-if (len(sys.argv) == 2):
-    trial_number = int(sys.argv[1])
-else:
-    trial_number = 4
-LR = trials[trial_number][0]
-EPOCHS = trials[trial_number][1]
-SCHEDULE = True
+def str2bool(v):
+    return v.lower() in ("yes", "true", "t", "1")
+
+parser = argparse.ArgumentParser(description="Training ResNet on CIFAR100")
+parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
+parser.add_argument("--epochs", default=30, type=int, help="number of training epochs")
+parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
+parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
+parser.add_argument("--show_sample_image", default=True, type=str2bool, help="display data insights")
+parser.add_argument("--debug", default=False, type=str2bool, help="using debug mode")
+parser.add_argument("--data_path", default="./data", type=str, help="path to store data")
+args = parser.parse_args()
 
 
 def main():
@@ -58,10 +54,10 @@ def main():
 
     # Load data.
     print("*** Performing data augmentation...")
-    train_data_loader, test_data_loader = data_loader_and_transformer(DATA_PATH)
+    train_data_loader, test_data_loader = data_loader_and_transformer(args.data_path)
 
     # Load sample image.
-    if SHOW_SAMPLE_IMAGE:
+    if args.show_sample_image:
         print("*** Loading image sample from a batch...")
         data_iter = iter(train_data_loader)
         images, labels = data_iter.next()  # Retrieve a batch of data
@@ -94,28 +90,28 @@ def main():
     # Load checkpoint.
     start_epoch = 0
     best_acc = 0
-    if LOAD_CHECKPOINT:
+    if args.load_checkpoint:
         print("*** Loading checkpoint...")
         start_epoch, best_acc = load_checkpoint(resnet)
 
     # Training.
     print("*** Start training on device {}...".format(device))
     print("* Hyperparameters: LR = {}, EPOCHS = {}, LR_SCHEDULE = {}"
-          .format(LR, EPOCHS, SCHEDULE))
+          .format(args.lr, args.epochs, args.lr_schedule))
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(resnet.parameters(), lr=LR)
+    optimizer = torch.optim.Adam(resnet.parameters(), lr=args.lr)
     train(
         resnet,
         criterion,
         optimizer,
         best_acc,
         start_epoch,
-        EPOCHS,
+        args.epochs,
         train_data_loader,
         test_data_loader,
         device,
-        lr_schedule=SCHEDULE,
-        debug=DEBUG
+        lr_schedule=args.lr_schedule,
+        debug=args.debug
     )
 
     # Testing.
@@ -125,7 +121,7 @@ def main():
         criterion,
         test_data_loader,
         device,
-        debug=DEBUG
+        debug=args.debug
     )
     
     print("*** Congratulations! You've got an amazing model now :)")
