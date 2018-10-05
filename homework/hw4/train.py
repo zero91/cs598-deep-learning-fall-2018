@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from test import test
+
 from utils import save_checkpoint
 
 def train(
@@ -11,7 +13,8 @@ def train(
     best_acc, 
     start_epoch, 
     epochs,
-    train_data_loader, 
+    train_data_loader,
+    test_data_loader,
     device,
     lr_schedule=False,
     debug=False
@@ -79,5 +82,8 @@ def train(
             if accuracy > best_acc:
                 best_acc = accuracy
                 save_checkpoint(net, curt_epoch, best_acc)
+        
+        # Test every epoch
+        test(net, criterion, test_data_loader, device, debug=DEBUG)
     
     print("Training [finished]")

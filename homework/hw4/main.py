@@ -19,7 +19,7 @@ LOAD_CHECKPOINT = False
 SHOW_SAMPLE_IMAGE = True
 
 # Set to True to run in a debug mode which uses less data
-DEBUG = True
+DEBUG = False
 
 DATA_PATH = "./data"
 
@@ -106,6 +106,7 @@ def main():
         start_epoch,
         EPOCHS,
         train_data_loader,
+        test_data_loader,
         device,
         lr_schedule=False,
         debug=DEBUG
