@@ -32,6 +32,9 @@ trials = [
     [0.001, 30],
     [0.001, 15]]
 
+# acc: 0.62430
+# Hyperparameters: LR = 0.001, EPOCHS = 30, LR_SCHEDULE = True
+
 if (len(sys.argv) == 2):
     trial_number = int(sys.argv[1])
 else:
