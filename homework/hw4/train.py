@@ -44,7 +44,8 @@ def train(
 
         # Schedule learning rate if specified.
         if lr_schedule:
-            optim.lr_scheduler.StepLR(optimizer, 30, gamma=0.1)
+            scheduler = optim.lr_scheduler.StepLR(optimizer, 15, gamma=0.1)
+            scheduler.step()
 
         # Traning step.
         for batch_index, (images, labels) in enumerate(train_data_loader):

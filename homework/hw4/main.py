@@ -29,15 +29,16 @@ trials = [
     [0.001, 50],
     [0.01, 100],
     [0.001, 100],
-    [0.001, 70],
+    [0.001, 30],
     [0.001, 15]]
 
 if (len(sys.argv) == 2):
     trial_number = int(sys.argv[1])
 else:
-    trial_number = 5
+    trial_number = 4
 LR = trials[trial_number][0]
 EPOCHS = trials[trial_number][1]
+SCHEDULE = True
 
 
 def main():
@@ -96,6 +97,8 @@ def main():
 
     # Training.
     print("*** Start training on device {}...".format(device))
+    print("* Hyperparameters: LR = {}, EPOCHS = {}, LR_SCHEDULE = {}"
+          .format(LR, EPOCHS, SCHEDULE))
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(resnet.parameters(), lr=LR)
     train(
@@ -108,7 +111,7 @@ def main():
         train_data_loader,
         test_data_loader,
         device,
-        lr_schedule=False,
+        lr_schedule=SCHEDULE,
         debug=DEBUG
     )
 
