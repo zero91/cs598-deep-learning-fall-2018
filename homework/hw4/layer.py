@@ -15,7 +15,7 @@ class BasicBlock(nn.Module):
         )
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = nn.Sequential(
-            nn.Conv2d(in_channels,
+            nn.Conv2d(out_channels,
                       out_channels,
                       kernel_size=3,
                       stride=1,
@@ -45,9 +45,9 @@ class BasicBlock(nn.Module):
 
         x = self.conv2(x)
         if self.downsample:
-            residual = self.projection(x)
+            residual = self.projection(residual)
         x += residual
-        x = self.relu(x)
+        # x = self.relu(x)
 
         return x
         
