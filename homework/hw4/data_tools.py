@@ -2,7 +2,6 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-
 def data_loader_and_transformer(root_path, fine_tune=False):
     """Utils for loading and preprocessing data
     Args:
