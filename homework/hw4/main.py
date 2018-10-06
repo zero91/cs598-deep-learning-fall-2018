@@ -12,24 +12,12 @@ from train import train
 from test import test
 from utils import load_checkpoint
 
-# # Set to True if you have checkpoints available and want to resume from it
-# LOAD_CHECKPOINT = False
-
-# # Set to True to get some insights of the data
-# SHOW_SAMPLE_IMAGE = True
-
-# # Set to True to run in a debug mode which uses less data
-# DEBUG = False
-
-# DATA_PATH = "./data"
-
-
 import argparse
-
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 parser = argparse.ArgumentParser(description="Training ResNet on CIFAR100")
+parser.add_argument("--fine_tune", default=False, type=str2bool, help="fine-tune pretrained model")
 parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
 parser.add_argument("--epochs", default=30, type=int, help="number of training epochs")
 parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
@@ -79,9 +67,12 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # Load model.
-    print("*** Initializing model...")
-    resnet = ResNet([2, 4, 4, 2])
-    # print(resnet)
+    if args.fine_tune:
+        print("==> JUST TESTING FOR FINETUNE")
+    else:
+        print("*** Initializing model...")
+        resnet = ResNet([2, 4, 4, 2])
+
     resnet = resnet.to(device)
     if device == 'cuda':
         resnet = torch.nn.DataParallel(resnet)
