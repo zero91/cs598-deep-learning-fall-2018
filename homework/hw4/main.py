@@ -21,7 +21,7 @@ def str2bool(v):
 parser = argparse.ArgumentParser(description="Training ResNet on CIFAR100")
 parser.add_argument("--fine_tune", default=False, type=str2bool, help="fine-tune pretrained model")
 parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
-parser.add_argument("--epochs", default=20, type=int, help="number of training epochs")
+parser.add_argument("--epochs", default=40, type=int, help="number of training epochs")
 parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
 parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
 parser.add_argument("--show_sample_image", default=False, type=str2bool, help="display data insights")
