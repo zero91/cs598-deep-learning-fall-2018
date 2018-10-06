@@ -47,7 +47,7 @@ def test(
             total_correct += predict_label.eq(labels.long()).float().sum().item()
             accuracy = total_correct / total_samples
 
-            print('Testing [batch: %d] loss: %.3f, accuracy: %.5f' %
-                    (batch_index + 1, curt_loss, accuracy))
+            # print('Testing [batch: %d] loss: %.3f, accuracy: %.5f' %
+            #         (batch_index + 1, curt_loss, accuracy))
     
-    print("Testing [finished] finial accuracy: %.5f" % accuracy)
+    print("Testing [finished] accuracy: %.5f" % accuracy)

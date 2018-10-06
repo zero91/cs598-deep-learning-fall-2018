@@ -17,7 +17,7 @@ def load_checkpoint(net):
 
 
 def save_checkpoint(net, epoch, best_acc):
-    print("Saving model to disk...")
+    # print("Saving model to disk...")
 
     state = {
         'model_state_dict': net.state_dict(),

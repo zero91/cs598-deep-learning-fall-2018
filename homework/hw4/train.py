@@ -76,15 +76,19 @@ def train(
             total_correct += predict_label.eq(labels.long()).float().sum().item()
             accuracy = total_correct / total_samples
             
-            print('Training [epoch: %d, batch: %d] loss: %.3f, accuracy: %.5f' %
-                    (curt_epoch + 1, batch_index + 1, curt_loss, accuracy))
+            # print('Training [epoch: %d, batch: %d] loss: %.3f, accuracy: %.5f' %
+            #         (curt_epoch + 1, batch_index + 1, curt_loss, accuracy))
             
             # Update best accuracy and save checkpoint
             if accuracy > best_acc:
                 best_acc = accuracy
                 save_checkpoint(net, curt_epoch, best_acc)
         
-        # Test every epoch
-        test(net, criterion, test_data_loader, device, debug=DEBUG)
+        # Loss.
+        print('Training [epoch: %d] loss: %.3f, accuracy: %.5f' %
+                (curt_epoch + 1, curt_loss, accuracy))
+        
+        # Test every epoch.
+        test(net, criterion, test_data_loader, device, debug=debug)
     
     print("Training [finished]")

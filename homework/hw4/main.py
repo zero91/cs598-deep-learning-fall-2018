@@ -1,5 +1,6 @@
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn as nn
 
 import matplotlib.pyplot as plt
 import sys
@@ -11,6 +12,7 @@ from model import ResNet
 from train import train
 from test import test
 from utils import load_checkpoint
+from fine_tune import resnet18
 
 import argparse
 def str2bool(v):
@@ -19,10 +21,10 @@ def str2bool(v):
 parser = argparse.ArgumentParser(description="Training ResNet on CIFAR100")
 parser.add_argument("--fine_tune", default=False, type=str2bool, help="fine-tune pretrained model")
 parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
-parser.add_argument("--epochs", default=30, type=int, help="number of training epochs")
+parser.add_argument("--epochs", default=20, type=int, help="number of training epochs")
 parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
 parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
-parser.add_argument("--show_sample_image", default=True, type=str2bool, help="display data insights")
+parser.add_argument("--show_sample_image", default=False, type=str2bool, help="display data insights")
 parser.add_argument("--debug", default=False, type=str2bool, help="using debug mode")
 parser.add_argument("--data_path", default="./data", type=str, help="path to store data")
 args = parser.parse_args()
@@ -42,7 +44,9 @@ def main():
 
     # Load data.
     print("*** Performing data augmentation...")
-    train_data_loader, test_data_loader = data_loader_and_transformer(args.data_path)
+    train_data_loader, test_data_loader = data_loader_and_transformer(
+                                                args.data_path, 
+                                                fine_tune=args.fine_tune)
 
     # Load sample image.
     if args.show_sample_image:
@@ -57,7 +61,7 @@ def main():
         print("shape of a single image", images[0].shape)
         # labels type torch.LongTensor, shape torch.Size([128])
         print("labels type {}, shape {}".format(labels.type(), labels.shape))
-        # label for the first 4 images tensor([2, 3, 4, 2])
+        # label for the first 4 images tensor([12, 51, 91, 36])
         print("label for the first 4 images", labels[:4])
         
         # Get a sampled image.
@@ -68,7 +72,10 @@ def main():
 
     # Load model.
     if args.fine_tune:
-        print("==> JUST TESTING FOR FINETUNE")
+        print("*** Initializing pre-trained model...")
+        resnet = resnet18()
+        in_features = resnet.fc.in_features
+        resnet.fc = nn.Linear(in_features, 100)
     else:
         print("*** Initializing model...")
         resnet = ResNet([2, 4, 4, 2])

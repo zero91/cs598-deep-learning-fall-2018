@@ -3,7 +3,7 @@ import torchvision
 import torchvision.transforms as transforms
 
 
-def data_loader_and_transformer(root_path):
+def data_loader_and_transformer(root_path, fine_tune=False):
     """Utils for loading and preprocessing data
     Args:
         root_path(string): the path to download/fetch the data
@@ -14,16 +14,31 @@ def data_loader_and_transformer(root_path):
 
     # Data augmentation.
     # See https://github.com/kuangliu/pytorch-cifar/issues/19 for the normalization data.
-    train_data_transform = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
-    ])
-    test_data_tranform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
-    ])
+    
+    if not fine_tune:
+        train_data_transform = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+        ])
+        test_data_tranform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+        ])
+    else:
+        train_data_transform = transforms.Compose([
+            transforms.Resize(224),
+            transforms.RandomCrop(224, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+        ])
+        test_data_tranform = transforms.Compose([
+            transforms.Resize(224),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)),
+        ])
 
     # Data loader.
     train_dataset = torchvision.datasets.CIFAR100(
