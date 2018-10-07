@@ -31,10 +31,7 @@ args = parser.parse_args()
 
 
 def main():
-    """High level pipelines.
-    Usage: run "python3 main.py trial_num"
-    such as "python3 main.py 1"
-    """
+    """High level pipelines."""
 
     # Set seed.
     torch.manual_seed(0)
