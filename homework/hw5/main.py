@@ -1,4 +1,6 @@
-from utils import generate_train_img_names, generate_val_img_names, generate_triplets
+from utils import generate_train_img_names, generate_val_img_names
+
+import os.path
 
 import argparse
 # def str2bool(v):
@@ -18,15 +20,14 @@ def main():
     """High level pipelines."""
 
     # Prepare files for the dataset
+    print("==> Peparing files...")
+
     train_list = "train_list.txt"
     val_list = "val_list.txt"
-    triplet_list = "triplet_list.txt"
 
-    generate_train_img_names("data/tiny-imagenet-200/train/", train_list)
-    generate_val_img_names("data/tiny-imagenet-200/val/", val_list)
-    generate_triplets(args.epochs, triplet_list)
-
-
+    if (not os.path.isfile(train_list)) or (not os.path.isfile(val_list)):
+        generate_train_img_names("data/tiny-imagenet-200/train/", train_list)
+        generate_val_img_names("data/tiny-imagenet-200/val/", val_list)
 
 if __name__ == "__main__":
     main()
