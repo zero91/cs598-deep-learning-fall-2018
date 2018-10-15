@@ -35,7 +35,3 @@ def generate_val_img_names(root_path, out_path):
             out.write(root_path + "images/" + image_name + " " + label + "\n")
     
     out.close()
-
-    
-
-

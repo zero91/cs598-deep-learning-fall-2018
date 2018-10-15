@@ -58,7 +58,6 @@ def main():
         ])
     )
 
-    # shuffle or not ??
     # num_workers = 32 on BW
     workers = multiprocessing.cpu_count()
     print("\tnumber of workers: {}".format(workers))
@@ -81,10 +80,12 @@ def main():
         data_iter = iter(train_loader)
         images, labels = data_iter.next()  # Retrieve a batch of data
         
+        # All in shape torch.Size([128, 3, 224, 224])
         print("\tlist (len = {}) of batch images".format(len(images)))
         print("\ta batch of query images in shape {}".format(images[0].shape))
         print("\ta batch of positive images in shape {}".format(images[1].shape))
         print("\ta batch of negative images in shape {}".format(images[2].shape))
+        print("\tshape of labels within a batch {}".format(len(labels[0])))
         
         # Get a sampled triplet.
         fig = plt.figure()
@@ -104,7 +105,7 @@ def main():
     
 
     # TODO: Load ResNet101, write utils for checkpoint, train and test
-    
+
 
 if __name__ == "__main__":
     main()
