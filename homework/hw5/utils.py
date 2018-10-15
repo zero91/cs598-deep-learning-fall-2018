@@ -36,51 +36,6 @@ def generate_val_img_names(root_path, out_path):
     
     out.close()
 
-# Do online sampling instead
-# def generate_triplets(num_epochs, out_path):
-#     """Generate triplets. Each triplet set contains three integers [i, j, k] 
-#     corresponding to the index of [query, positive, negative] images in 
-#     the train_list file.
-#     Args:
-#         num_epochs(int): epochs for training,
-#                 for every epoch, generate 100000 triplets
-#         out_path(str): txt file to store the results
-#     """
-
-#     out = open(out_path, "w")
-
-#     for _ in range(num_epochs):
-#         # 200 classes, each has 500 images, 100000 in total
-#         count = 0  # from 0 to 199
-#         step = 500
-#         start = 0
-#         end = start + step - 1
-#         total = 100000
-#         for i in range(total):
-#             # Identify the current class
-#             if i != 0 and i % step == 0:
-#                 count += 1
-#                 start = count * step
-#                 end = start + step - 1
-
-#             # Query image
-#             query_idx = i
-
-#             # Sample positive image within the same class
-#             positive_idx = random.randint(start, end)
-#             while positive_idx == query_idx:
-#                 positive_idx = random.randint(start, end)
-            
-#             # Sample positive image in other class
-#             range1 = list(range(0, start))
-#             range2 = list(range(end + 1, total))
-#             negative_idx = random.sample(range1 + range2, 1)[0]
-
-#             out.write("{} {} {}\n".format(query_idx, positive_idx, negative_idx))
-    
-#     out.close()
-
-
     
 
 

@@ -81,10 +81,10 @@ def main():
         data_iter = iter(train_loader)
         images, labels = data_iter.next()  # Retrieve a batch of data
         
-        print("list (len = {}) of batch images".format(len(images)))
-        print("a batch of query images in shape {}".format(images[0].shape))
-        print("a batch of positive images in shape {}".format(images[1].shape))
-        print("a batch of negative images in shape {}".format(images[2].shape))
+        print("\tlist (len = {}) of batch images".format(len(images)))
+        print("\ta batch of query images in shape {}".format(images[0].shape))
+        print("\ta batch of positive images in shape {}".format(images[1].shape))
+        print("\ta batch of negative images in shape {}".format(images[2].shape))
         
         # Get a sampled triplet.
         fig = plt.figure()
@@ -101,6 +101,10 @@ def main():
             if i == 2:
                 plt.show()
                 break
+    
+
+    # TODO: Load ResNet101, write utils for checkpoint, train and test
+    
 
 if __name__ == "__main__":
     main()

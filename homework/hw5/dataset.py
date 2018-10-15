@@ -1,11 +1,5 @@
-import torch
 from PIL import Image
-import os
-import os.path
-import numpy as np
-from torch.utils.data import Dataset, DataLoader
-import torchvision
-import torchvision.transforms as transforms
+from torch.utils.data import Dataset
 
 import random
 
