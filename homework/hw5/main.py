@@ -79,7 +79,7 @@ def main():
         print("==> Loading image sample from a batch...")
         data_iter = iter(train_loader)
         images, labels = data_iter.next()  # Retrieve a batch of data
-        
+
         # All in shape torch.Size([128, 3, 224, 224])
         print("\tlist (len = {}) of batch images".format(len(images)))
         print("\ta batch of query images in shape {}".format(images[0].shape))
