@@ -137,7 +137,7 @@ def main():
     chpt_name = 'model_state_' + args.model + '.pt'
     if args.load_checkpoint:
         print("==> Loading checkpoint...")
-        start_epoch, best_loss= load_checkpoint(resnet, chpt_name)
+        start_epoch, best_loss = load_checkpoint(resnet, chpt_name)
     
     # Training.
     print("==> Start training on device {}...".format(device))
