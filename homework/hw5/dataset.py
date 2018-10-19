@@ -16,30 +16,19 @@ class TinyImageNetDataset(Dataset):
                 path, label = line.strip().split()
                 self.image_paths.append(path)
                 self.labels.append(label)
-        
-        # Load all images
-        self.images = []
-        for path in self.image_paths:
-            img = Image.open(path)
-            img = img.convert('RGB')
-            if self.transform is not None:
-                img = self.transform(img)
-            self.images.append(img)
-        
-        print("loaded {} images, each in shape {}".format(len(self.images), self.images[0].numpy().shape))
-   
-    def get_all_images(self):
-        return self.images
-    
-    def get_all_labels(self):
+
+    def get_labels(self):
         return self.labels
 
     def __getitem__(self, index):
-        """Sample triplets online."""
+        """Sample triplets online"""
 
         if not self.train:
-            img = self.images[index]
+            img = Image.open(self.image_paths[index])
+            img = img.convert('RGB')
             label = self.labels[index]
+            if self.transform is not None:
+                img = self.transform(img)
             return img, label
         
         else:
@@ -63,15 +52,24 @@ class TinyImageNetDataset(Dataset):
             negative_idx = random.sample(range1 + range2, 1)[0]
 
             # Load the three images
-            q_img = self.images[query_idx]
-            p_img = self.images[positive_idx]
-            n_img = self.images[negative_idx]
+            q_img = Image.open(self.image_paths[query_idx])
+            p_img = Image.open(self.image_paths[positive_idx])
+            n_img = Image.open(self.image_paths[negative_idx])
+            q_img = q_img.convert('RGB')
+            p_img = p_img.convert('RGB')
+            n_img = n_img.convert('RGB')
 
             q_label = self.labels[query_idx]
             p_label = self.labels[positive_idx]
             n_label = self.labels[negative_idx]
 
-            # Return tuple of the three images
+            # Transform
+            if self.transform is not None:
+                q_img = self.transform(q_img)
+                p_img = self.transform(p_img)
+                n_img = self.transform(n_img)
+
+            # Return tuple of the three images and tuple of the labels
             return (q_img, p_img, n_img), (q_label, p_label, n_label)
     
     def __len__(self):
