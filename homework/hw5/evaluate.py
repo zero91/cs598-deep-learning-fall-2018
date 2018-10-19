@@ -10,6 +10,7 @@ from dataset import TinyImageNetDataset
 import multiprocessing
 import numpy as np
 from sklearn.neighbors import KDTree
+import time
 
 import argparse
 def str2bool(v):
@@ -39,16 +40,15 @@ models = {
 
 
 class ResultEvaluationHandler:
-    def __init__(self, trained_net, train_set, val_set, train_loader, val_loader):
+    def __init__(self, trained_net, train_set, val_set, train_loader, val_loader, device):
         """Handler for evaluating the training and test accuracy
         Args:
             trained_net: a trained deep ranking model loaded from checkpoint
             train_loader: loader for train data
             val_loader: loader for validation data
         """
-        # Trained model.
         self.net = trained_net
-        self.net.eval()
+        self.device = device
 
         # Dataset.
         self.train_set = train_set
@@ -82,47 +82,66 @@ class ResultEvaluationHandler:
         num_images = len(dataset)
         total_acc = 0
 
-        for i in range(num_images):
-            q_image, q_label = dataset[i]
-            q_embedding = self.net(q_image).numpy()
+        start_time = time.time()
 
-            # Convert 1d vector to 2d in shape [1, 4096]
-            q_embedding = q_embedding.reshape(1, -1)
+        with torch.no_grad():
+            for i in range(num_images):
+                q_image, q_label = dataset[i]
+                q_image = q_image.to(self.device)
+                q_embedding = self.net(q_image).cpu().numpy()
 
-            # Find top 30, shape [1, 30]
-            indices = self.tree.query(q_embedding, k=30, return_distance=False)
+                # Convert 1d vector to 2d in shape [1, 4096]
+                q_embedding = q_embedding.reshape(1, -1)
 
-            # Compute accuracy
-            retrieved_labels = self.train_labels[indices[0]]  # (30,)
-            correct_labels = np.where(retrieved_labels==q_label)[0]
-            correct_count = correct_labels.shape[0]
-            curt_acc = correct_count / 30
-            total_acc += curt_acc
+                # Find top 30, shape [1, 30]
+                indices = self.tree.query(q_embedding, k=30, return_distance=False)
+
+                # Compute accuracy
+                retrieved_labels = self.train_labels[indices[0]]  # (30,)
+                correct_labels = np.where(retrieved_labels==q_label)[0]
+                correct_count = correct_labels.shape[0]
+                curt_acc = correct_count / 30
+                total_acc += curt_acc
+
+                if ((i + 1) % 1000 == 0):
+                    print('[images: %d] accuracy: %.5f' %
+                          (i + 1, total_acc / (i + 1)))
+                
+                if (i + 1 == 1000):
+                    print("--- %s seconds for 1000 images ---" % (time.time() - start_time))
+           
+            avg_acc = total_acc / num_images
         
-        avg_acc = total_acc / num_images
         return avg_acc
 
     def _get_embeddings(self):
         """Get embeddings for all training images"""
+
+        print("Computing feature embeddings...")
+        
         self.net.eval()
         embeddings = []
-        
-        for _, (images, _) in enumerate(self.train_loader):
-            # images [batch size, 3, 224, 224]
-            # labels: list of length (batch_size)
 
-            # [batch size, 4096]
-            batch_embeddings = self.net(images)
-            batch_embeddings = batch_embeddings.numpy()
-
-            # put embed into list
-            embeddings += batch_embeddings.tolist()
+        start_time = time.time()
         
+        with torch.no_grad():
+            for _, (images, _) in enumerate(self.train_loader):
+                # images [batch size, 3, 224, 224]
+                # [batch size, 4096]
+                images = images.to(self.device)
+                batch_embeddings = self.net(images).cpu().numpy()
+
+                # put embed into list
+                embeddings += batch_embeddings.tolist()
+        
+        print("--- %s seconds for getting embeddings ---" % (time.time() - start_time))
+
         # Shape [num_train_images, embedding_size]
         return np.array(embeddings)
     
     def query(self, label):
         """Sample an image of a class in val set and query the ranking results"""
+
 
 def model_analyze():
     print("==> Start analyzing model...")
@@ -184,15 +203,16 @@ def model_analyze():
     )
 
     # Perform evaluation
+    print("==> Loading evaluation handler...")
     evaluation = ResultEvaluationHandler(resnet, train_set, val_set,
-                                         train_loader, val_loader)
+                                         train_loader, val_loader, device)
     if args.evaluate:
-        print("==> Evaluating accuracies...")
-
+        print("==> Calculating training accuracy...")
         train_acc = evaluation.get_train_accuracy()
         print('Train at [epoch: %d] loss: %.3f, accuracy: %.5f' %
                 (start_epoch + 1, best_loss, train_acc))
 
+        print("==> Calculating test accuracy...")
         test_acc = evaluation.get_test_accuracy()
         print('Test at [epoch: %d] accuracy: %.5f' %
                 (start_epoch + 1, test_acc))      
