@@ -18,16 +18,39 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 parser = argparse.ArgumentParser(description="Image Ranking")
-parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
-parser.add_argument("--epochs", default=20, type=int, help="number of training epochs")
-parser.add_argument("--batch_size", default=10, type=int, help="batch size")
-parser.add_argument("--feature_embedding", default=4096, type=int, help="dimension of embedded feature")
-parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
-parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
-parser.add_argument("--show_sample_image", default=False, type=str2bool, help="display data insights")
-parser.add_argument("--debug", default=False, type=str2bool, help="using debug mode")
-# parser.add_argument("--data_path", default="./data", type=str, help="path to store data")
+
+# Hyperparameters.
+parser.add_argument("--lr", default=0.001, type=float, 
+                    help="learning rate")
+parser.add_argument("--epochs", default=40, type=int, 
+                    help="number of training epochs")
+parser.add_argument("--batch_size", default=30, type=int, 
+                    help="batch size")
+parser.add_argument("--feature_embedding", default=4096, type=int, 
+                    help="dimension of embedded feature")
+
+# Model options.
+parser.add_argument("--model", default='resnet34', type=str, 
+                    help="name of the chosen ResNet model")
+
+# Training options.
+parser.add_argument("--lr_schedule", default=True, type=str2bool, 
+                    help="perform lr shceduling")
+parser.add_argument("--load_checkpoint", default=False, type=str2bool, 
+                    help="resume from checkpoint")
+parser.add_argument("--show_sample_image", default=False, type=str2bool, 
+                    help="display data insights")
+parser.add_argument("--debug", default=False, type=str2bool, 
+                    help="using debug mode")
+
 args = parser.parse_args()
+
+models = {
+    'resnet18': models.resnet18(pretrained=True), 
+    'resnet34': models.resnet34(pretrained=True),
+    'resnet50': models.resnet50(pretrained=True),
+    'resnet101': models.resnet101(pretrained=True)
+}
 
 def main():
     """High level pipelines."""
@@ -55,15 +78,6 @@ def main():
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
     )
-    # val_set = TinyImageNetDataset(
-    #     val_list,
-    #     train=False,
-    #     transform=transforms.Compose([
-    #         transforms.Resize(224),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    #     ])
-    # )
 
     # num_workers = 32 on BW
     workers = multiprocessing.cpu_count()
@@ -74,12 +88,6 @@ def main():
         shuffle=True,
         num_workers=workers
     )
-    # val_loader = torch.utils.data.DataLoader(
-    #     val_set,
-    #     batch_size=args.batch_size,
-    #     shuffle=False,
-    #     num_workers=workers
-    # )
 
     # Show sample image.
     if args.show_sample_image:
@@ -111,8 +119,8 @@ def main():
                 break
     
     # Load model.
-    print("==> Loading pretrained ResNet model...")
-    resnet = models.resnet101(pretrained=True)
+    print("==> Loading pretrained {} model...".format(args.model))
+    resnet = models[args.model]
     in_features = resnet.fc.in_features
     resnet.fc = nn.Linear(in_features, args.feature_embedding)
 
@@ -126,9 +134,10 @@ def main():
     # Load checkpoint.
     start_epoch = 0
     best_loss = sys.maxsize
+    chpt_name = 'model_state_' + args.model + '.pt'
     if args.load_checkpoint:
         print("==> Loading checkpoint...")
-        start_epoch, best_loss= load_checkpoint(resnet)
+        start_epoch, best_loss= load_checkpoint(resnet, chpt_name)
     
     # Training.
     print("==> Start training on device {}...".format(device))
@@ -140,6 +149,7 @@ def main():
     train(resnet, criterion, optimizer, 
           best_loss, start_epoch, args.epochs, 
           train_loader, device, 
+          chpt_name, 
           lr_schedule=args.lr_schedule, debug=args.debug)
 
     # TODO: Write a separate file for evaluation. 

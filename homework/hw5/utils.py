@@ -38,14 +38,14 @@ def generate_val_img_names(root_path, out_path):
     
     out.close()
 
-def load_checkpoint(net):
+def load_checkpoint(net, chpt_name):
     print("Loading model from disk...")
 
     if not os.path.isdir('checkpoints'):
         print("Error: no checkpoints available.")
         raise AssertionError()
     
-    checkpoint = torch.load('checkpoints/model_state.pt')
+    checkpoint = torch.load('checkpoints/' + chpt_name)
     net.load_state_dict(checkpoint['model_state_dict'])
     start_epoch = checkpoint['epoch']
     best_loss = checkpoint['best_loss']
@@ -53,7 +53,7 @@ def load_checkpoint(net):
     return start_epoch, best_loss
 
 
-def save_checkpoint(net, epoch, best_loss):
+def save_checkpoint(net, epoch, best_loss, chpt_name):
     """Save checkpoint to disk
     Args:
         net(model class)
@@ -69,4 +69,4 @@ def save_checkpoint(net, epoch, best_loss):
     if not os.path.isdir('checkpoints'):
         os.mkdir('checkpoints')
     
-    torch.save(state, 'checkpoints/model_state.pt')
+    torch.save(state, 'checkpoints/' + chpt_name)

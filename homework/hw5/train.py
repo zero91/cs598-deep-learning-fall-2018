@@ -8,6 +8,7 @@ from utils import save_checkpoint
 def train(net, criterion, optimizer,
           best_loss, start_epoch, epochs,
           train_data_loader, device, 
+          chpt_name,
           lr_schedule=False, debug=False):
     """Training setups
     Args:
@@ -19,6 +20,7 @@ def train(net, criterion, optimizer,
         epochs(int): total number of epochs
         train_data_loader(iterator)
         device(str): 'cpu' or 'cuda'
+        chpt_name(str): name of the checkpoint to be saved
         lr_schedule(bool): whether to perform leanring rate scheduling
         debug(bool): whether to use a debug mode
     """
@@ -40,7 +42,6 @@ def train(net, criterion, optimizer,
         # To monitor the training process.
         running_loss = 0
         total_samples = 0
-        num_images = 0
 
         # Schedule learning rate if specified.
         if lr_schedule:
@@ -48,8 +49,8 @@ def train(net, criterion, optimizer,
             scheduler.step()
 
         # Traning step.
-        for batch_index, (images, labels) in enumerate(train_data_loader):
-            start_time = time.time()
+        start_time = time.time()
+        for batch_index, (images, _) in enumerate(train_data_loader):
 
             # Only train on a smaller subset if debug mode is true
             if debug and total_samples >= 10001:
@@ -59,8 +60,6 @@ def train(net, criterion, optimizer,
             q_batch = q_batch.to(device)
             p_batch = p_batch.to(device)
             n_batch = n_batch.to(device)
-
-            labels = labels.to(device)
 
             optimizer.zero_grad()
 
@@ -77,8 +76,7 @@ def train(net, criterion, optimizer,
 
             # Loss.
             running_loss += loss.item()
-            num_images += q_batch.shape[0]
-            curt_loss = running_loss / num_images
+            curt_loss = running_loss / (batch_index + 1)
             
             # Print and write loss to file.
             if ((batch_index + 1) % 100 == 0):
@@ -89,10 +87,12 @@ def train(net, criterion, optimizer,
             # Update best loss and save checkpoint
             if curt_loss < best_loss:
                 best_loss = curt_loss
-                save_checkpoint(net, curt_epoch, best_loss)
+                save_checkpoint(net, curt_epoch, best_loss, chpt_name)
 
-            # Time for 1 epoch
-            print("--- %s seconds for 1 epoch ---" % (time.time() - start_time))
+            total_samples += q_batch.shape[0]
+        
+        # Time for 1 epoch
+        print("--- %s seconds for 1 epoch ---" % (time.time() - start_time))
             
     print("Training [finished]")
     loss_file.close()
