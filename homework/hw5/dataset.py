@@ -26,8 +26,14 @@ class TinyImageNetDataset(Dataset):
                 img = self.transform(img)
             self.images.append(img)
         
-        print("loaded {} images".format(len(self.images)))
+        print("loaded {} images, each in shape {}".format(len(self.images), self.images[0].numpy().shape))
    
+    def get_all_images(self):
+        return self.images
+    
+    def get_all_labels(self):
+        return self.labels
+
     def __getitem__(self, index):
         """Sample triplets online."""
 
@@ -65,7 +71,7 @@ class TinyImageNetDataset(Dataset):
             p_label = self.labels[positive_idx]
             n_label = self.labels[negative_idx]
 
-            # Return tuple of the three images and tuple of the labels
+            # Return tuple of the three images
             return (q_img, p_img, n_img), (q_label, p_label, n_label)
     
     def __len__(self):

@@ -1,6 +1,8 @@
+import os
 from os import listdir
 from os.path import join
 import random
+import torch
 
 def generate_train_img_names(root_path, out_path):
     """Get path and label of training images.
@@ -35,3 +37,36 @@ def generate_val_img_names(root_path, out_path):
             out.write(root_path + "images/" + image_name + " " + label + "\n")
     
     out.close()
+
+def load_checkpoint(net):
+    print("Loading model from disk...")
+
+    if not os.path.isdir('checkpoints'):
+        print("Error: no checkpoints available.")
+        raise AssertionError()
+    
+    checkpoint = torch.load('checkpoints/model_state.pt')
+    net.load_state_dict(checkpoint['model_state_dict'])
+    start_epoch = checkpoint['epoch']
+    best_loss = checkpoint['best_loss']
+
+    return start_epoch, best_loss
+
+
+def save_checkpoint(net, epoch, best_loss):
+    """Save checkpoint to disk
+    Args:
+        net(model class)
+        epoch(int): current epoch number
+        best_loss(float): best training loss till now
+    """
+
+    state = {
+        'model_state_dict': net.state_dict(),
+        'epoch': epoch,
+        'best_loss': best_loss
+    }
+    if not os.path.isdir('checkpoints'):
+        os.mkdir('checkpoints')
+    
+    torch.save(state, 'checkpoints/model_state.pt')

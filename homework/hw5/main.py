@@ -1,12 +1,17 @@
 import torch
 import torchvision.transforms as transforms
+import torchvision.models as models
+import torch.nn as nn
+import torch.backends.cudnn as cudnn
 
-from utils import generate_train_img_names, generate_val_img_names
+from utils import *
 from dataset import TinyImageNetDataset
+from train import train
 
 import os.path
 import multiprocessing
 import matplotlib.pyplot as plt
+import sys
 
 import argparse
 def str2bool(v):
@@ -14,11 +19,13 @@ def str2bool(v):
 
 parser = argparse.ArgumentParser(description="Image Ranking")
 parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
-parser.add_argument("--epochs", default=40, type=int, help="number of training epochs")
-# parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
-# parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
+parser.add_argument("--epochs", default=20, type=int, help="number of training epochs")
+parser.add_argument("--batch_size", default=10, type=int, help="batch size")
+parser.add_argument("--feature_embedding", default=4096, type=int, help="dimension of embedded feature")
+parser.add_argument("--lr_schedule", default=True, type=str2bool, help="perform lr shceduling")
+parser.add_argument("--load_checkpoint", default=False, type=str2bool, help="resume from checkpoint")
 parser.add_argument("--show_sample_image", default=False, type=str2bool, help="display data insights")
-# parser.add_argument("--debug", default=False, type=str2bool, help="using debug mode")
+parser.add_argument("--debug", default=False, type=str2bool, help="using debug mode")
 # parser.add_argument("--data_path", default="./data", type=str, help="path to store data")
 args = parser.parse_args()
 
@@ -35,7 +42,7 @@ def main():
         generate_train_img_names("data/tiny-imagenet-200/train/", train_list)
         generate_val_img_names("data/tiny-imagenet-200/val/", val_list)
     
-    # Load data
+    # Load data.
     print("==> Loading data...")
     train_set = TinyImageNetDataset(
         train_list, 
@@ -48,33 +55,33 @@ def main():
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
     )
-    val_set = TinyImageNetDataset(
-        val_list,
-        train=False,
-        transform=transforms.Compose([
-            transforms.Resize(224),
-            transforms.ToTensor(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        ])
-    )
+    # val_set = TinyImageNetDataset(
+    #     val_list,
+    #     train=False,
+    #     transform=transforms.Compose([
+    #         transforms.Resize(224),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    #     ])
+    # )
 
     # num_workers = 32 on BW
     workers = multiprocessing.cpu_count()
     print("\tnumber of workers: {}".format(workers))
     train_loader = torch.utils.data.DataLoader(
         train_set,
-        batch_size=128,
+        batch_size=args.batch_size,
         shuffle=True,
         num_workers=workers
     )
-    val_loader = torch.utils.data.DataLoader(
-        val_set,
-        batch_size=128,
-        shuffle=False,
-        num_workers=workers
-    )
+    # val_loader = torch.utils.data.DataLoader(
+    #     val_set,
+    #     batch_size=args.batch_size,
+    #     shuffle=False,
+    #     num_workers=workers
+    # )
 
-    # Show sample image
+    # Show sample image.
     if args.show_sample_image:
         print("==> Loading image sample from a batch...")
         data_iter = iter(train_loader)
@@ -103,8 +110,45 @@ def main():
                 plt.show()
                 break
     
+    # Load model.
+    print("==> Loading pretrained ResNet model...")
+    resnet = models.resnet101(pretrained=True)
+    in_features = resnet.fc.in_features
+    resnet.fc = nn.Linear(in_features, args.feature_embedding)
 
-    # TODO: Load ResNet101, write utils for checkpoint, train and test
+    # Use available device.
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    resnet = resnet.to(device)
+    if device == 'cuda':
+        resnet = torch.nn.DataParallel(resnet)
+        cudnn.benchmark = True
+
+    # Load checkpoint.
+    start_epoch = 0
+    best_loss = sys.maxsize
+    if args.load_checkpoint:
+        print("==> Loading checkpoint...")
+        start_epoch, best_loss= load_checkpoint(resnet)
+    
+    # Training.
+    print("==> Start training on device {}...".format(device))
+    print("\tHyperparameters: LR = {}, EPOCHS = {}, LR_SCHEDULE = {}"
+          .format(args.lr, args.epochs, args.lr_schedule))
+
+    criterion = nn.TripletMarginLoss()
+    optimizer = torch.optim.SGD(resnet.parameters(), lr=0.001, momentum=0.9)
+    train(resnet, criterion, optimizer, 
+          best_loss, start_epoch, args.epochs, 
+          train_loader, device, 
+          lr_schedule=args.lr_schedule, debug=args.debug)
+
+    # TODO: Write a separate file for evaluation. 
+    # Load the saved checkpoint, use the saved model to do forward pass
+    # to get the feature embeddings and calculate
+    # training and testing accuracies using precision at top 30.
+    # Note that the training set should be loaded as train=False and shuffle=False
+    # since we'll load 1 train image as query each time
+    # This is the same for the validate set
 
 
 if __name__ == "__main__":
