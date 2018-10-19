@@ -77,6 +77,8 @@ class ResultEvaluationHandler:
         else:
             dataset = self.val_set
         
+        self.net.eval()
+
         num_images = len(dataset)
         total_acc = 0
 
@@ -102,7 +104,9 @@ class ResultEvaluationHandler:
 
     def _get_embeddings(self):
         """Get embeddings for all training images"""
+        self.net.eval()
         embeddings = []
+        
         for _, (images, _) in enumerate(self.train_loader):
             # images [batch size, 3, 224, 224]
             # labels: list of length (batch_size)
