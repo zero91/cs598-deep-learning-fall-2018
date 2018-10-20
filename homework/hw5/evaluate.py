@@ -56,10 +56,15 @@ class ResultEvaluationHandler:
         self.train_loader = train_loader
         self.val_loader = val_loader
 
-        # Label is a list being converted to 1d no array (num_images,)
+        # Label is a list being converted to 1d no array (num_images,).
         self.train_labels = np.array(self.train_set.get_labels())
         self.val_labels = np.array(self.val_set.get_labels())
 
+        # Get the list of the paths of all images.
+        self.train_paths = self.train_set.get_paths()
+        self.val_paths = self.val_set.get_paths()
+
+        # For embedding and qury.
         self.embeddings = self._get_embeddings()
         self.tree = KDTree(self.embeddings)
 
@@ -87,7 +92,12 @@ class ResultEvaluationHandler:
         with torch.no_grad():
             for i in range(num_images):
                 q_image, q_label = dataset[i]
+                # Shape (3, 224, 224)
                 q_image = q_image.to(self.device)
+                # Shape (1, 3, 224, 224) - must do this to ensure dim corectness
+                q_image = q_image.unsqueeze(0)
+
+                # Forward pass.
                 q_embedding = self.net(q_image).cpu().numpy()
 
                 # Convert 1d vector to 2d in shape [1, 4096]
@@ -127,8 +137,8 @@ class ResultEvaluationHandler:
         with torch.no_grad():
             for _, (images, _) in enumerate(self.train_loader):
                 # images [batch size, 3, 224, 224]
-                # [batch size, 4096]
                 images = images.to(self.device)
+                # [batch size, 4096]
                 batch_embeddings = self.net(images).cpu().numpy()
 
                 # put embed into list
@@ -140,7 +150,63 @@ class ResultEvaluationHandler:
         return np.array(embeddings)
     
     def query(self, label):
-        """Sample an image of a class in val set and query the ranking results"""
+        """Sample 5 images in val set and query the ranking results"""
+
+        # Sample 5 images from different class in val set
+        uniques = set()
+        while len(uniques) < 5:
+            q_indices = np.random.choice(len(self.val_labels), size=5)
+            q_labels = self.val_labels[q_indices]
+            uniques = set(q_labels)
+        
+        q_paths = [self.val_paths[idx] for idx in q_indices]
+
+        # Retrieve ranking result
+        for index in q_indices:
+            q_image, q_label = self.val_set[index]
+
+            print("=> [query {}] label: {}".format(index + 1, q_label))
+
+            # Get feature embedding for query image
+            q_image = q_image.to(self.device)
+            q_image = q_image.unsqueeze(0)
+
+            # Forward pass.
+            q_embedding = self.net(q_image).cpu().numpy()
+
+            # Find top 10 and bottom 10
+            total_imgs = len(self.train_set)
+            q_embedding = q_embedding.reshape(1, -1)
+            distances, indices = self.tree.query(q_embedding, k=total_imgs)  #[1, total_imgs]
+
+            top10_dist = distances[0][:10]
+            top10_idx = indices[0][:10]
+            bottom10_dist = distances[0][-10:]
+            bottom10_idx = indices[0][-10:]
+
+            print("Top 10 distances and indices:\n{}\n{}"
+                  .format(top10_dist, self.train_labels[top10_idx]))
+            print("Bottom 10 distances and indices:\n{}\n{}"
+                  .format(bottom10_dist, self.train_labels[bottom10_idx]))
+
+            # Write paths, labels and distances to file (format: path, label, dist)
+            with open('query_results_' + str(index+1) + '.txt', 'w') as file:
+                # Write query imagg
+                file.write("{} {} 0\n".format(q_paths[index], q_labels[index]))
+
+                # Write top 10
+                for i in range(10):
+                    idx = top10_idx[i]
+                    dist = top10_dist[i]
+                    file.write("{} {} {}\n"
+                        .format(self.train_paths[idx], self.train_labels[idx], dist))
+                
+                # Write bottom 10
+                for i in range(10):
+                    idx = bottom10_idx[i]
+                    dist = bottom10_dist[i]
+                    file.write("{} {} {}\n"
+                        .format(self.train_paths[idx], self.train_labels[idx], dist))
 
 
 def model_analyze():
@@ -161,6 +227,7 @@ def model_analyze():
     # Load trained model from disk.
     chpt_name = 'model_state_' + args.model + '.pt'
     start_epoch, best_loss = load_checkpoint(resnet, chpt_name)
+    print("Current model is at epoch {} with loss {}".format(start_epoch, best_loss))
 
     # Load all training and validation images.
     print("==> Loading images...")

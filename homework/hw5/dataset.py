@@ -19,6 +19,9 @@ class TinyImageNetDataset(Dataset):
 
     def get_labels(self):
         return self.labels
+    
+    def get_paths(self):
+        return self.image_paths
 
     def __getitem__(self, index):
         """Sample triplets online"""
