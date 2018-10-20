@@ -9,7 +9,7 @@ from dataset import TinyImageNetDataset
 
 import multiprocessing
 import numpy as np
-from sklearn.neighbors import KDTree
+from sklearn.neighbors import KDTree, NearestNeighbors
 import time
 
 import argparse
@@ -66,7 +66,9 @@ class ResultEvaluationHandler:
 
         # For embedding and qury.
         self.embeddings = self._get_embeddings()
-        self.tree = KDTree(self.embeddings)
+        # self.tree = KDTree(self.embeddings)
+        self.knn = NearestNeighbors(n_neighbors=30, leaf_size=30, n_jobs=16)
+        self.knn.fit(self.embeddings)
 
     def get_train_accuracy(self):
         return self._get_avg_accuracy(True)
@@ -84,44 +86,43 @@ class ResultEvaluationHandler:
         
         self.net.eval()
 
-        num_images = len(dataset)
         total_acc = 0
+        avg_acc = 0
 
         start_time = time.time()
 
         with torch.no_grad():
-            for i in range(num_images):
-                q_image, q_label = dataset[i]
-                # Shape (3, 224, 224)
-                q_image = q_image.to(self.device)
-                # Shape (1, 3, 224, 224) - must do this to ensure dim corectness
-                q_image = q_image.unsqueeze(0)
+            for batch_index, (q_images, q_labels) in enumerate(self.train_loader):
+                # Shape (batch_size, 3, 224, 224)
+                q_images = q_images.to(self.device)
+                q_labels = q_labels.numpy()             # (batch_size,)
+                q_labels = q_labels.reshape(-1, 1)      # (batch_size, 1)
+                batch_size = q_labels.shape[0]
 
                 # Forward pass.
-                q_embedding = self.net(q_image).cpu().numpy()
+                q_embedding = self.net(q_images).cpu().numpy()
 
-                # Convert 1d vector to 2d in shape [1, 4096]
-                q_embedding = q_embedding.reshape(1, -1)
+                # Find top 30, shape (batch_size, 30).
+                indices = self.knn.kneighbors(q_embedding, n_neighbors=3, return_distance=False)
 
-                # Find top 30, shape [1, 30]
-                indices = self.tree.query(q_embedding, k=30, return_distance=False)
-
-                # Compute accuracy
-                retrieved_labels = self.train_labels[indices[0]]  # (30,)
-                correct_labels = np.where(retrieved_labels==q_label)[0]
-                correct_count = correct_labels.shape[0]
-                curt_acc = correct_count / 30
-                total_acc += curt_acc
-
-                if ((i + 1) % 1000 == 0):
-                    print('[images: %d] accuracy: %.5f' %
-                          (i + 1, total_acc / (i + 1)))
+                # Compute accuracy.
+                retrieved_labels = self.train_labels[indices[0]]  # (batch_size, 30)
                 
-                if (i + 1 == 1000):
-                    print("--- %s seconds for 1000 images ---" % (time.time() - start_time))
-           
-            avg_acc = total_acc / num_images
-        
+                correct_labels = np.where(retrieved_labels==q_labels)[0]
+                correct_count = correct_labels.shape[0]
+
+                curt_acc = correct_count / (30 * batch_size)       # Batch average accuracy
+                total_acc += curt_acc
+                avg_acc = total_acc / (batch_index + 1)
+
+                if ((batch_index + 1) % 100 == 0):
+                    print('[batch: %d] accuracy: %.5f' % (batch_index + 1, avg_acc))
+                
+                if (batch_index + 1 == 100):
+                    print("--- %s seconds for 100 batch ---" % (time.time() - start_time))
+
+        print('[Finished] accuracy: %.5f' % (avg_acc))   
+            
         return avg_acc
 
     def _get_embeddings(self):
@@ -177,7 +178,9 @@ class ResultEvaluationHandler:
             # Find top 10 and bottom 10
             total_imgs = len(self.train_set)
             q_embedding = q_embedding.reshape(1, -1)
-            distances, indices = self.tree.query(q_embedding, k=total_imgs)  #[1, total_imgs]
+            # distances, indices = self.tree.query(q_embedding, k=total_imgs)  #[1, total_imgs]
+            distances, indices = self.knn.kneighbors(q_embedding, n_neighbors=total_imgs, 
+                                                     return_distance=True)
 
             top10_dist = distances[0][:10]
             top10_idx = indices[0][:10]

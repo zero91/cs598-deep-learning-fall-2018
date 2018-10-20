@@ -31,13 +31,13 @@ def train(net, criterion, optimizer,
         # Set to train mode.
         net.train()
 
-        # Avoid the potential overflow error.
-        if curt_epoch > 10:
-            for group in optimizer.param_groups:
-                for p in group['params']:
-                    state = optimizer.state[p]
-                    if state['step'] >= 1024:
-                        state['step'] = 1000
+        # Avoid the potential overflow error when using Adam.
+        # if curt_epoch > 10:
+        #     for group in optimizer.param_groups:
+        #         for p in group['params']:
+        #             state = optimizer.state[p]
+        #             if state['step'] >= 1024:
+        #                 state['step'] = 1000
 
         # To monitor the training process.
         running_loss = 0

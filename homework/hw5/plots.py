@@ -60,6 +60,7 @@ def plot_query_results(path):
         idx=[11, 20], bottom10_path label distances
     """
 
+
 if __name__ == '__main__':
     if args.plot_type == 'loss':
         plot_train_loss(args.path)
