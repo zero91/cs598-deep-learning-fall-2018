@@ -95,18 +95,18 @@ class ResultEvaluationHandler:
             for batch_index, (q_images, q_labels) in enumerate(self.train_loader):
                 # Shape (batch_size, 3, 224, 224)
                 q_images = q_images.to(self.device)
-                q_labels = q_labels.numpy()             # (batch_size,)
-                q_labels = q_labels.reshape(-1, 1)      # (batch_size, 1)
+                q_labels = np.array(q_labels)         # Convert tuple to np array (batch_size,)
+                q_labels = q_labels.reshape(-1, 1)    # (batch_size, 1)
                 batch_size = q_labels.shape[0]
 
-                # Forward pass.
+                # Forward pass, shape (batch_size, 4096)
                 q_embedding = self.net(q_images).cpu().numpy()
 
                 # Find top 30, shape (batch_size, 30).
-                indices = self.knn.kneighbors(q_embedding, n_neighbors=3, return_distance=False)
+                indices = self.knn.kneighbors(q_embedding, n_neighbors=30, return_distance=False)
 
                 # Compute accuracy.
-                retrieved_labels = self.train_labels[indices[0]]  # (batch_size, 30)
+                retrieved_labels = self.train_labels[indices]  # (batch_size, 30)
                 
                 correct_labels = np.where(retrieved_labels==q_labels)[0]
                 correct_count = correct_labels.shape[0]
