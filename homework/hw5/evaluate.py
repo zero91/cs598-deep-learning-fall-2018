@@ -196,8 +196,8 @@ class ResultEvaluationHandler:
 
                 # Write paths, labels and distances to file (format: path, label, dist)
                 with open('query_results_' + str(ite_count+1) + '.txt', 'w') as file:
-                    # Write query imagg
-                    file.write("{} {} 0\n".format(q_paths[index], q_labels[index]))
+                    # Write query image
+                    file.write("{} {} 0\n".format(q_paths[ite_count], q_labels[ite_count]))
 
                     # Write top 10
                     for i in range(10):
