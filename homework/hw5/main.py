@@ -22,15 +22,15 @@ parser = argparse.ArgumentParser(description="Image Ranking")
 # Hyperparameters.
 parser.add_argument("--lr", default=0.001, type=float, 
                     help="learning rate")
-parser.add_argument("--epochs", default=40, type=int, 
+parser.add_argument("--epochs", default=20, type=int, 
                     help="number of training epochs")
-parser.add_argument("--batch_size", default=30, type=int, 
+parser.add_argument("--batch_size", default=16, type=int, 
                     help="batch size")
 parser.add_argument("--feature_embedding", default=4096, type=int, 
                     help="dimension of embedded feature")
 
 # Model options.
-parser.add_argument("--model", default='resnet34', type=str, 
+parser.add_argument("--model", default='resnet50', type=str, 
                     help="name of the chosen ResNet model")
 
 # Training options.

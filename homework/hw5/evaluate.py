@@ -17,9 +17,9 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 parser = argparse.ArgumentParser(description="Evaluate the trained model")
-parser.add_argument("--batch_size", default=30, type=int, 
+parser.add_argument("--batch_size", default=16, type=int, 
                     help="batch size for loading images")
-parser.add_argument("--model", default='resnet34', type=str, 
+parser.add_argument("--model", default='resnet50', type=str, 
                     help="name of the trained ResNet model")
 
 # Evaluation options.
