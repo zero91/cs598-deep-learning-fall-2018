@@ -150,7 +150,7 @@ class ResultEvaluationHandler:
         # Shape [num_train_images, embedding_size]
         return np.array(embeddings)
     
-    def query(self, label):
+    def query(self):
         """Sample 5 images in val set and query the ranking results"""
 
         # Sample 5 images from different class in val set
@@ -163,53 +163,55 @@ class ResultEvaluationHandler:
         q_paths = [self.val_paths[idx] for idx in q_indices]
 
         # Retrieve ranking result
-        for index in q_indices:
-            q_image, q_label = self.val_set[index]
+        self.net.eval()
+        with torch.no_grad():
+            for ite_count, index in enumerate(q_indices):
+                q_image, q_label = self.val_set[index]
 
-            print("=> [query {}] label: {}".format(index + 1, q_label))
+                print("=> [query {}] label: {}".format(ite_count + 1, q_label))
 
-            # Get feature embedding for query image
-            q_image = q_image.to(self.device)
-            q_image = q_image.unsqueeze(0)
+                # Get feature embedding for query image
+                q_image = q_image.to(self.device)
+                q_image = q_image.unsqueeze(0)
 
-            # Forward pass.
-            q_embedding = self.net(q_image).cpu().numpy()
+                # Forward pass.
+                q_embedding = self.net(q_image).cpu().numpy()
 
-            # Find top 10 and bottom 10
-            total_imgs = len(self.train_set)
-            q_embedding = q_embedding.reshape(1, -1)
-            # distances, indices = self.tree.query(q_embedding, k=total_imgs)  #[1, total_imgs]
-            distances, indices = self.knn.kneighbors(q_embedding, n_neighbors=total_imgs, 
-                                                     return_distance=True)
+                # Find top 10 and bottom 10
+                total_imgs = len(self.train_set)
+                q_embedding = q_embedding.reshape(1, -1)
+                # distances, indices = self.tree.query(q_embedding, k=total_imgs)  #[1, total_imgs]
+                distances, indices = self.knn.kneighbors(q_embedding, n_neighbors=total_imgs, 
+                                                        return_distance=True)
 
-            top10_dist = distances[0][:10]
-            top10_idx = indices[0][:10]
-            bottom10_dist = distances[0][-10:]
-            bottom10_idx = indices[0][-10:]
+                top10_dist = distances[0][:10]
+                top10_idx = indices[0][:10]
+                bottom10_dist = distances[0][-10:]
+                bottom10_idx = indices[0][-10:]
 
-            print("Top 10 distances and indices:\n{}\n{}"
-                  .format(top10_dist, self.train_labels[top10_idx]))
-            print("Bottom 10 distances and indices:\n{}\n{}"
-                  .format(bottom10_dist, self.train_labels[bottom10_idx]))
+                print("Top 10 distances and indices:\n{}\n{}"
+                    .format(top10_dist, self.train_labels[top10_idx]))
+                print("Bottom 10 distances and indices:\n{}\n{}"
+                    .format(bottom10_dist, self.train_labels[bottom10_idx]))
 
-            # Write paths, labels and distances to file (format: path, label, dist)
-            with open('query_results_' + str(index+1) + '.txt', 'w') as file:
-                # Write query imagg
-                file.write("{} {} 0\n".format(q_paths[index], q_labels[index]))
+                # Write paths, labels and distances to file (format: path, label, dist)
+                with open('query_results_' + str(ite_count+1) + '.txt', 'w') as file:
+                    # Write query imagg
+                    file.write("{} {} 0\n".format(q_paths[index], q_labels[index]))
 
-                # Write top 10
-                for i in range(10):
-                    idx = top10_idx[i]
-                    dist = top10_dist[i]
-                    file.write("{} {} {}\n"
-                        .format(self.train_paths[idx], self.train_labels[idx], dist))
-                
-                # Write bottom 10
-                for i in range(10):
-                    idx = bottom10_idx[i]
-                    dist = bottom10_dist[i]
-                    file.write("{} {} {}\n"
-                        .format(self.train_paths[idx], self.train_labels[idx], dist))
+                    # Write top 10
+                    for i in range(10):
+                        idx = top10_idx[i]
+                        dist = top10_dist[i]
+                        file.write("{} {} {}\n"
+                            .format(self.train_paths[idx], self.train_labels[idx], dist))
+                    
+                    # Write bottom 10
+                    for i in range(10):
+                        idx = bottom10_idx[i]
+                        dist = bottom10_dist[i]
+                        file.write("{} {} {}\n"
+                            .format(self.train_paths[idx], self.train_labels[idx], dist))
 
 
 def model_analyze():
@@ -288,11 +290,8 @@ def model_analyze():
                 (start_epoch + 1, test_acc))      
 
     if args.query:
-        pass
-
-# TODO: query function
-# TODO: plot loss should be in another file and run separately
-
+        print("==> Start query...")
+        evaluation.query()
 
 if __name__ == '__main__':
     model_analyze()
