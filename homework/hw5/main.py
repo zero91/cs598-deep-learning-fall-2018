@@ -152,14 +152,6 @@ def main():
           chpt_name, 
           lr_schedule=args.lr_schedule, debug=args.debug)
 
-    # TODO: Write a separate file for evaluation. 
-    # Load the saved checkpoint, use the saved model to do forward pass
-    # to get the feature embeddings and calculate
-    # training and testing accuracies using precision at top 30.
-    # Note that the training set should be loaded as train=False and shuffle=False
-    # since we'll load 1 train image as query each time
-    # This is the same for the validate set
-
 
 if __name__ == "__main__":
     main()
