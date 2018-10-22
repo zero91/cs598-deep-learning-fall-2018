@@ -1,3 +1,7 @@
 data/
 remote/
 *.ipynb
+checkpoints/
+report_hw5_ziyuz2.pdf
+plots_set_1/
+*.txt

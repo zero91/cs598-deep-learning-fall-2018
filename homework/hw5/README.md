@@ -10,13 +10,13 @@
 
 ## Test Accuracy
 
-
+57.460%
 
 ## Implementation
 
 ### Model Architecture
 
-Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model is fine tuned to extract feature embeddings from the training images.
+Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model is fine tuned to extract feature embedding from the training images.
 
 ### Hyperparameters
 
@@ -37,11 +37,9 @@ Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model i
 ├── evaluate.py		# Calculate training and test accuracies, perform query
 ├── main.py			# Main file to execute to train the model
 ├── plots.py		# Plot loss and query results
-├── train.py		# Training process
-├── utils.py		# Some helper utils
+├── train.py		# 
+├── utils.py
 ```
-
-See the **Usage** section for how to run the program.
 
 
 
@@ -59,9 +57,9 @@ See the **Usage** section for how to run the program.
 
 ### Similarity precision
 
-|                      | Training | Test |
-| -------------------- | :------: | :--: |
-| Similarity precision |          |      |
+|                      | Training | Test    |
+| -------------------- | -------- | ------- |
+| Similarity precision | 64.862%  | 57.460% |
 
 
 
@@ -130,6 +128,12 @@ The first image (top left) is the query image. The text on top of each image con
 #### Bottom 10
 
 ![](plots/query_plot_5_bottom.png)
+
+## How to Improve the performance
+
+> Describe at least one way in how you can improve the performance of your network
+
+Use weighted sampling instead of uniform sampling for triplet sampling. Uniform sampling is sub-optimal because it doesn't consider the relevance among images. Weighted sampling can help select the most important triplets by computing a weighted relevance score for each image such that positive images with high relevance scores will be chosen at a higher probability. 
 
 ## Usage
 
