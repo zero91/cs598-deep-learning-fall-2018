@@ -1,0 +1,9 @@
+remote/
+checkpoints/
+
+report_hw6_ziyuz2.pdf
+*.model
+
+__pycache__/
+.ipynb_checkpoints/
+*.ipynb
