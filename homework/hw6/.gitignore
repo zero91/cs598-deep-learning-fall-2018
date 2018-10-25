@@ -1,5 +1,7 @@
 remote/
 checkpoints/
+cifar-10-python.tar.gz
+cifar-10-batches-py/
 
 report_hw6_ziyuz2.pdf
 *.model

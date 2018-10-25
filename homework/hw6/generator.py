@@ -9,8 +9,8 @@ class Generator(nn.Module):
         self.out_channels = 196
 
         self.fc1 = nn.Sequential(
-            nn.Linear(100, 196*4*4)
-            # nn.BatchNorm2d() # need to figure out the num_features
+            nn.Linear(100, 196*4*4),
+            nn.BatchNorm2d(196*4*4)
         )
 
         self.conv1 = self._add_transpose_block()

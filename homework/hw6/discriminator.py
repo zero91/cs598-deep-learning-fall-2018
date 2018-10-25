@@ -31,8 +31,8 @@ class Discriminator(nn.Module):
     
     def forward(self, x):
         for layer in self.conv_layers:
-            x = layer(x)       
-        x = x.maxpool(x)
+            x = layer(x)
+        x = self.maxpool(x)
 
         # Reshape to (batch_size, 1*1*196)
         x = x.view(x.shape[0], -1)
