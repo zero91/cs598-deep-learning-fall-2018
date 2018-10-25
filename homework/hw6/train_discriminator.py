@@ -4,8 +4,7 @@ import torchvision
 import torchvision.transforms as transforms
 
 from discriminator import Discriminator
-
-import multiprocessing
+from data_tools import data_loader_and_transformer
 
 import argparse
 def str2bool(v):
@@ -28,62 +27,19 @@ parser.add_argument("--load_checkpoint", default=False, type=str2bool,
 args = parser.parse_args()
 
 
+# Load data.
 print("==> Loading data...")
-
-transform_train = transforms.Compose([
-    transforms.RandomResizedCrop(32, scale=(0.7, 1.0), ratio=(1.0,1.0)),
-    transforms.ColorJitter(
-            brightness=0.1*torch.randn(1),
-            contrast=0.1*torch.randn(1),
-            saturation=0.1*torch.randn(1),
-            hue=0.1*torch.randn(1)),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-])
-
-transform_test = transforms.Compose([
-    transforms.CenterCrop(32),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-])
-
-workers = multiprocessing.cpu_count()
-print("\tnumber of workers: {}".format(workers))
-
-trainset = torchvision.datasets.CIFAR10(
-    root='./', train=True, download=True, transform=transform_train
-)
-trainloader = torch.utils.data.DataLoader(
-    trainset, 
-    batch_size=args.batch_size, 
-    shuffle=True, 
-    num_workers=workers
-)
-
-testset = torchvision.datasets.CIFAR10(
-    root='./', train=False, download=False, transform=transform_test
-)
-testloader = torch.utils.data.DataLoader(
-    testset, 
-    batch_size=args.batch_size, 
-    shuffle=False, 
-    num_workers=workers
-)
+trainloader, testloader = data_loader_and_transformer(args.batch_size)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+# Load model.
 print("==> Initializing model...")
 model = Discriminator()
 if args.load_checkpoint:
     print("==> Loading checkpoint...")
     model = torch.load('cifar10.model')
 model = model.to(device)
-
-# Training.
-print("==> Start training on device {}...".format(device))
-print("\tHyperparameters: LR = {}, EPOCHS = {}, BATCH_SIZE = {}"
-        .format(args.lr, args.epochs, args.batch_size))
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -145,7 +101,7 @@ def train(epoch):
     print('Training [epoch: %d] loss: %.3f, accuracy: %.5f' %
             (epoch + 1, curt_loss, accuracy))
     
-    if epoch + 1 == args.epoch // 5:
+    if epoch + 1 == args.epochs // 5:
         print("=> Saving model checkpoint...")
         torch.save(model,'cifar10.model')
 
@@ -165,7 +121,7 @@ def test(epoch):
             images = images.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
+            _, outputs = model(images)
             loss = criterion(outputs, labels)
             
             # Loss.
@@ -182,10 +138,13 @@ def test(epoch):
             (epoch + 1, curt_loss, accuracy))
 
 
-
 # --------------------------
 # Start training and testing
 # --------------------------
+
+print("==> Start training on device {}...".format(device))
+print("\tHyperparameters: LR = {}, EPOCHS = {}, BATCH_SIZE = {}"
+        .format(args.lr, args.epochs, args.batch_size))
 
 for epoch in range(args.epochs):
     train(epoch)
