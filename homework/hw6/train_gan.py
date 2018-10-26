@@ -151,9 +151,15 @@ for epoch in range(0, num_epochs):
 
     # Avoid the potential overflow error from Adam.
     if epoch > 10:
-        for group in optimizer.param_groups:
+        for group in optimizer_g.param_groups:
             for p in group['params']:
-                state = optimizer.state[p]
+                state = optimizer_g.state[p]
+                if ('step' in state) and (state['step'] >= 1024):
+                    state['step'] = 1000
+        
+        for group in optimizer_d.param_groups:
+            for p in group['params']:
+                state = optimizer_d.state[p]
                 if ('step' in state) and (state['step'] >= 1024):
                     state['step'] = 1000
 
