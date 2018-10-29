@@ -1,8 +1,7 @@
 ------
 # Fall 2018 IE534/CS598:  HW5
 
-**Name**: Ziyu Zhou, 
-**NetID**: ziyuz2
+**Author**: Ziyu Zhou
 
 ------
 
@@ -42,7 +41,7 @@ Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model i
 ```
 
 
-
+<div style="page-break-after: always;"></div>
 ## Quantitative results
 
 > Quantitative results
@@ -62,7 +61,7 @@ Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model i
 | Similarity precision | 64.862%  | 57.460% |
 
 
-
+<div style="page-break-after: always;"></div>
 ## Sampling
 
 > Sample 5 different images from the validation set (each from a different class)
@@ -81,60 +80,69 @@ The first image (top left) is the query image. The text on top of each image con
 
 ![](plots/query_plot_1_top.png)
 
+<div style="page-break-after: always;"></div>
 #### Bottom 10
 
 ![](plots/query_plot_1_bottom.png)
 
 
-
+<div style="page-break-after: always;"></div>
 ### Sample #2
 
 #### Top 10
 
 ![](plots/query_plot_2_top.png)
 
+<div style="page-break-after: always;"></div>
 #### Bottom 10
 
 ![](plots/query_plot_2_bottom.png)
 
 
-
+<div style="page-break-after: always;"></div>
 ### Sample #3
 
 #### Top 10
 
 ![](plots/query_plot_3_top.png)
 
+<div style="page-break-after: always;"></div>
 #### Bottom 10
 
 ![](plots/query_plot_3_bottom.png)
 
+<div style="page-break-after: always;"></div>
 ### Sample #4
 
 #### Top 10
 
 ![](plots/query_plot_4_top.png)
 
+<div style="page-break-after: always;"></div>
 #### Bottom 10
 
 ![](plots/query_plot_4_bottom.png)
 
+<div style="page-break-after: always;"></div>
 ### Sample #5
 
 #### Top 10
 
 ![](plots/query_plot_5_top.png)
 
+<div style="page-break-after: always;"></div>
 #### Bottom 10
 
 ![](plots/query_plot_5_bottom.png)
 
+<div style="page-break-after: always;"></div>
 ## How to Improve the performance
 
 > Describe at least one way in how you can improve the performance of your network
 
 Use weighted sampling instead of uniform sampling for triplet sampling. Uniform sampling is sub-optimal because it doesn't consider the relevance among images. Weighted sampling can help select the most important triplets by computing a weighted relevance score for each image such that positive images with high relevance scores will be chosen at a higher probability. 
 
+<div style="page-break-after: always;"></div>
 ## Usage
 
 1. Train the model

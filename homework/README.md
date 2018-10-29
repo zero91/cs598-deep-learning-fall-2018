@@ -20,17 +20,21 @@
     mkdir <local-path>
     sshfs -o ssh_command="ssh <bw-username>@bwbay.ncsa.illinois.edu ssh" h2ologin:<remote-path> <local-path>
     ```
-3. Interactive mode
+3. Load interactive mode
     ```
     qsub -I -l gres=ccm -l nodes=1:ppn=16:xk -l walltime=02:00:00
     ```
-4. Add modules
+4. Login to the compute node
+
+    In compute node, you can directly run your program.
     ```
     module add ccm
     ccmlogin
     module load bwpy/2.0.0-pre1
     ```
-5. Run the job
+5. Submit a job to BW
+
+    This can be done inside login node.
     ```
     qsub run.pbs
     ```

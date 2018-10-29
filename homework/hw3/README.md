@@ -1,8 +1,7 @@
 ------
 # Fall 2018 IE534/CS598:  HW3
 
-**Name**: Ziyu Zhou, 
-**NetID**: ziyuz2
+**Author**: Ziyu Zhou
 
 ------
 

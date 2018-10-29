@@ -80,9 +80,9 @@ class ResultEvaluationHandler:
         """Get average accuracy accross all query images"""
 
         if get_train_acc:
-            dataset = self.train_set
+            loader = self.train_loader
         else:
-            dataset = self.val_set
+            loader = self.val_loader
         
         self.net.eval()
 
@@ -92,7 +92,7 @@ class ResultEvaluationHandler:
         start_time = time.time()
 
         with torch.no_grad():
-            for batch_index, (q_images, q_labels) in enumerate(self.train_loader):
+            for batch_index, (q_images, q_labels) in enumerate(loader):
                 # Shape (batch_size, 3, 224, 224)
                 q_images = q_images.to(self.device)
                 q_labels = np.array(q_labels)         # Convert tuple to np array (batch_size,)
