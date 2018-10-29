@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 class Discriminator(nn.Module):
     def __init__(self):
@@ -29,18 +30,53 @@ class Discriminator(nn.Module):
         self.fc1 = nn.Linear(self.out_channels, 1)
         self.fc10 = nn.Linear(self.out_channels, 10)
     
+    # def forward(self, x):
+    #     for layer in self.conv_layers:
+    #         x = layer(x)
+    #     x = self.maxpool(x)
+
+    #     # Reshape to (batch_size, 1*1*196)
+    #     x = x.view(x.shape[0], -1)
+
+    #     x_from_fc1 = self.fc1(x)
+    #     x_from_fc10 = self.fc10(x)
+
+    #     return x_from_fc1, x_from_fc10
+
+    def set_extract_features(self, extract_features=0):
+        self.extract_features = extract_features
+
     def forward(self, x):
-        for layer in self.conv_layers:
-            x = layer(x)
-        x = self.maxpool(x)
+        """
+        Modify the forward function of the discriminator such that 
+        it outputs features from a previous layer 
+        instead of outputs from fc1/fc10
+        Args:
+            extract_feature: after which layer to extact features
+        """
+        if self.extract_features != 0:
+            print("Exacting features at layer", self.extract_features)
+            for i in range(self.extract_features):
+                x = self.conv_layers[i](x)
 
-        # Reshape to (batch_size, 1*1*196)
-        x = x.view(x.shape[0], -1)
+            out_sizes = [32, 16, 16, 8, 8, 8, 8, 4]
+            size = out_sizes[self.extract_features - 1]
+            x = F.max_pool2d(x, size, size)
+            x = x.view(-1, self.out_channels)
+            return x
+        
+        else:
+            for layer in self.conv_layers:
+                x = layer(x)
+            x = self.maxpool(x)
 
-        x_from_fc1 = self.fc1(x)
-        x_from_fc10 = self.fc10(x)
+            # Reshape to (batch_size, 1*1*196)
+            x = x.view(x.shape[0], -1)
 
-        return x_from_fc1, x_from_fc10
+            x_from_fc1 = self.fc1(x)
+            x_from_fc10 = self.fc10(x)
+
+            return x_from_fc1, x_from_fc10
 
     def _add_block(self, stride, is_first_block=False):
         if stride == 2:

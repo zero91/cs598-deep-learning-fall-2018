@@ -3,6 +3,9 @@ checkpoints/
 cifar-10-python.tar.gz
 cifar-10-batches-py/
 
+output/
+output_first10/
+
 report_hw6_ziyuz2.pdf
 *.model
 
