@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import nltk
+nltk.download('punkt')
 import itertools
 import io
 
@@ -34,7 +35,7 @@ def get_all_reviews(directory, load_train_data=True):
 
         reviews.append(line)
         count += 1
-        print(count)
+        # print(count)
     
     return reviews
     
@@ -104,8 +105,8 @@ def preprocess_reviews(x_train, x_test):
                 f.write("%i " % token)
             f.write("\n")
         
-def preprocess_glove_features(x_train, x_test):
-    glove_filename = '/projects/training/bauh/NLP/glove.840B.300d.txt'
+def preprocess_glove_features(glove_filename, x_train, x_test):
+    # glove_filename = '/projects/training/bauh/NLP/glove.840B.300d.txt'
     with io.open(glove_filename,'r',encoding='utf-8') as f:
         lines = f.readlines()
 
@@ -152,5 +153,5 @@ if __name__ == "__main__":
     x_train = get_all_reviews("aclImdb/train/")
     x_test = get_all_reviews("aclImdb/test/", load_train_data=False)
 
-    preprocess_reviews(x_train, x_test)
-    preprocess_glove_features(x_train, x_test)
+    # preprocess_reviews(x_train, x_test)
+    preprocess_glove_features("glove.840B.300d.txt", x_train, x_test)

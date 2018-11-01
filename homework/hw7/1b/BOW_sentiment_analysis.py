@@ -13,13 +13,39 @@ import io
 
 from BOW_model import BOW_model
 
+# Hyperparameters.
+parser.add_argument("--lr", default=0.001, type=float, 
+                    help="learning rate")
+parser.add_argument("--epochs", default=6, type=int, 
+                    help="number of training epochs")
+parser.add_argument("--batch_size", default=200, type=int, 
+                    help="batch size")
+parser.add_argument("--vocab_size", default=100000, type=int, 
+                    help="dimension of embedded feature")
+parser.add_argument("--num_hidden_units", default=500, type=int, 
+                    help="dimension of embedded feature")
+parser.add_argument("--optimizer", default='adam', const='adam', nargs='?',
+                    choices=['adam', 'sgd'],
+                    help="dimension of embedded feature")                    
+
+args = parser.parse_args()
+print("Hyperparameters:\n", args)
+
+# Parse hyperparameters.
+vocab_size = args.vocab_size
+num_hidden_units = args.num_hidden_units  # also try 300
+
+LR = args.lr
+opt = args.opt
+batch_size = args.batch_size
+no_of_epochs = args.epochs
+
 
 # --------------
 # Glove features
 # --------------
 
 glove_embeddings = np.load('../preprocessed_data/glove_embeddings.npy')
-vocab_size = 100000
 
 x_train = []
 with io.open('../preprocessed_data/imdb_train_glove.txt','r',encoding='utf-8') as f:
@@ -60,21 +86,14 @@ y_test[0:12500] = 1
 
 vocab_size += 1
 
-model = BOW_model(500) # try 300 as well
+model = BOW_model(num_hidden_units) # try 300 as well
 model.cuda()
 
-
-# opt = 'sgd'
-# LR = 0.01
-opt = 'adam'
-LR = 0.001
 if opt == 'adam':
     optimizer = optim.Adam(model.parameters(), lr=LR)
 elif opt=='sgd' :
     optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
 
-batch_size = 200
-no_of_epochs = 6
 L_Y_train = len(y_train)
 L_Y_test = len(y_test)
 
@@ -141,12 +160,14 @@ for epoch in range(no_of_epochs):
 
     for i in range(0, L_Y_test, batch_size):
 
-        x_input = [x_test[j] for j in I_permutation[i:i+batch_size]]
-        y_input = np.asarray([y_test[j] for j in I_permutation[i:i+batch_size]],dtype=np.int)
+        x_input = x_test[I_permutation[i:i+batch_size]]
+        y_input = y_test[I_permutation[i:i+batch_size]]
+
+        data = Variable(torch.FloatTensor(x_input)).cuda()
         target = Variable(torch.FloatTensor(y_input)).cuda()
 
         with torch.no_grad():
-            loss, pred = model(x_input,target)
+            loss, pred = model(data, target)
         
         prediction = pred >= 0.0
         truth = target >= 0.5
