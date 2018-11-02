@@ -154,4 +154,4 @@ if __name__ == "__main__":
     x_test = get_all_reviews("aclImdb/test/", load_train_data=False)
 
     # preprocess_reviews(x_train, x_test)
-    preprocess_glove_features("glove.840B.300d.txt", x_train, x_test)
+    preprocess_glove_features("glove/glove.840B.300d.txt", x_train, x_test)

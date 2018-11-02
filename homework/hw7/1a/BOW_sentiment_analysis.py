@@ -43,6 +43,7 @@ opt = args.opt
 batch_size = args.batch_size
 no_of_epochs = args.epochs
 
+print("==> Loading data and model...")
 
 # Load training data
 x_train = []
@@ -66,7 +67,6 @@ y_train = np.zeros((25000,))
 y_train[0:12500] = 1
 
 # Load testing data
-print("==> Loading data and model...")
 
 x_test = []
 with io.open('../preprocessed_data/imdb_test.txt','r',encoding='utf-8') as f:

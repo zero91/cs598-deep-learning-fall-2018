@@ -10,8 +10,11 @@ import time
 import os
 import sys
 import io
+import argparse
 
 from BOW_model import BOW_model
+
+parser = argparse.ArgumentParser(description="1b - BOW Sentiment Analysis")
 
 # Hyperparameters.
 parser.add_argument("--lr", default=0.001, type=float, 
@@ -44,6 +47,8 @@ no_of_epochs = args.epochs
 # --------------
 # Glove features
 # --------------
+
+print("==> Loading data and model...")
 
 glove_embeddings = np.load('../preprocessed_data/glove_embeddings.npy')
 
@@ -102,6 +107,8 @@ model.train()
 train_loss = []
 train_accu = []
 test_accu = []
+
+print("==> Start training...")
 
 for epoch in range(no_of_epochs):
 
@@ -185,6 +192,8 @@ for epoch in range(no_of_epochs):
     time_elapsed = time2 - time1
 
     print("  ", "%.2f" % (epoch_acc*100.0), "%.4f" % epoch_loss)
+
+print("==> Saving model...")
 
 torch.save(model,'BOW.model')
 data = [train_loss,train_accu,test_accu]
