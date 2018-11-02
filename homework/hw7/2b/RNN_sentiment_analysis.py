@@ -23,7 +23,7 @@ parser.add_argument("--epochs", default=20, type=int,
                     help="number of training epochs")
 parser.add_argument("--batch_size", default=200, type=int, 
                     help="batch size")
-parser.add_argument("--vocab_size", default=8000, type=int, 
+parser.add_argument("--vocab_size", default=100000, type=int, 
                     help="dimension of embedded feature")
 parser.add_argument("--num_hidden_units", default=500, type=int, 
                     help="dimension of embedded feature")
@@ -58,32 +58,26 @@ sequence_lengths = [args.seq_len_train, args.seq_len_test]
 
 print("==> Loading data and model...")
 
-# Load training data
-x_train = []
-with io.open('../preprocessed_data/imdb_train.txt','r',encoding='utf-8') as f:
-    lines = f.readlines()
+glove_embeddings = np.load('../preprocessed_data/glove_embeddings.npy')
 
+x_train = []
+with io.open('../preprocessed_data/imdb_train_glove.txt','r',encoding='utf-8') as f:
+    lines = f.readlines()
 for line in lines:
     line = line.strip()
     line = line.split(' ')
-    line = np.asarray(line, dtype=np.int)
+    line = np.asarray(line,dtype=np.int)
 
     line[line>vocab_size] = 0
 
     x_train.append(line)
-
-# Only the first 25,000 are labeled
 x_train = x_train[0:25000]
-
-# The first 125000 are labeled 1 for positive and the last 12500 are labeled 0 for negative
 y_train = np.zeros((25000,))
 y_train[0:12500] = 1
 
-# Load testing data
 x_test = []
-with io.open('../preprocessed_data/imdb_test.txt','r',encoding='utf-8') as f:
+with io.open('../preprocessed_data/imdb_test_glove.txt','r',encoding='utf-8') as f:
     lines = f.readlines()
-
 for line in lines:
     line = line.strip()
     line = line.split(' ')
@@ -92,14 +86,12 @@ for line in lines:
     line[line>vocab_size] = 0
 
     x_test.append(line)
-
 y_test = np.zeros((25000,))
 y_test[0:12500] = 1
 
 vocab_size += 1
 
-# model = BOW_model(vocab_size, 500)
-model = RNN_model(vocab_size, num_hidden_units)
+model = RNN_model(num_hidden_units)
 model.cuda()
 
 if opt == 'adam':
@@ -135,11 +127,9 @@ for epoch in range(no_of_epochs):
     for i in range(0, L_Y_train, batch_size):
 
         x_input2 = [x_train[j] for j in I_permutation[i:i+batch_size]]
-
         # sequence_length = 100
         sequence_length = sequence_lengths[0]
-
-        x_input = np.zeros((batch_size, sequence_length), dtype=np.int)
+        x_input = np.zeros((batch_size,sequence_length),dtype=np.int)
         for j in range(batch_size):
             x = np.asarray(x_input2[j])
             sl = x.shape[0]
@@ -148,13 +138,14 @@ for epoch in range(no_of_epochs):
             else:
                 start_index = np.random.randint(sl-sequence_length+1)
                 x_input[j,:] = x[start_index:(start_index+sequence_length)]
+        x_input = glove_embeddings[x_input]
         y_input = y_train[I_permutation[i:i+batch_size]]
 
-        data = Variable(torch.LongTensor(x_input)).cuda()
+        data = Variable(torch.FloatTensor(x_input)).cuda()
         target = Variable(torch.FloatTensor(y_input)).cuda()
 
         optimizer.zero_grad()
-        loss, pred = model(data, target, train=True)
+        loss, pred = model(data,target,train=True)
         loss.backward()
 
         optimizer.step()   # update weights
@@ -199,11 +190,9 @@ for epoch in range(no_of_epochs):
         for i in range(0, L_Y_test, batch_size):
 
             x_input2 = [x_test[j] for j in I_permutation[i:i+batch_size]]
-
             # sequence_length = 100
             sequence_length = sequence_lengths[1]
-
-            x_input = np.zeros((batch_size, sequence_length), dtype=np.int)
+            x_input = np.zeros((batch_size,sequence_length),dtype=np.int)
             for j in range(batch_size):
                 x = np.asarray(x_input2[j])
                 sl = x.shape[0]
@@ -212,9 +201,10 @@ for epoch in range(no_of_epochs):
                 else:
                     start_index = np.random.randint(sl-sequence_length+1)
                     x_input[j,:] = x[start_index:(start_index+sequence_length)]
-            y_input = y_train[I_permutation[i:i+batch_size]]
+            x_input = glove_embeddings[x_input]
+            y_input = y_test[I_permutation[i:i+batch_size]]
 
-            data = Variable(torch.LongTensor(x_input)).cuda()
+            data = Variable(torch.FloatTensor(x_input)).cuda()
             target = Variable(torch.FloatTensor(y_input)).cuda()
 
             with torch.no_grad():

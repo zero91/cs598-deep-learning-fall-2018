@@ -17,25 +17,12 @@ from RNN_model import RNN_model
 parser = argparse.ArgumentParser(description="1a - BOW Sentiment Analysis")
 
 # Hyperparameters.
-# parser.add_argument("--lr", default=0.001, type=float, 
-#                     help="learning rate")
-
 parser.add_argument("--epochs", default=10, type=int, 
                     help="number of training epochs")
 parser.add_argument("--batch_size", default=200, type=int, 
                     help="batch size")
-
 parser.add_argument("--vocab_size", default=8000, type=int, 
                     help="dimension of embedded feature")
-# parser.add_argument("--num_hidden_units", default=500, type=int, 
-#                     help="dimension of embedded feature")
-# parser.add_argument("--optimizer", default='adam', const='adam', nargs='?',
-#                     choices=['adam', 'sgd'],
-#                     help="dimension of embedded feature")
-# parser.add_argument("--seq_len_train", default=100, type=int,
-#                     help="sequence length for training")                
-# parser.add_argument("--seq_len_test", default=50, type=int,
-#                     help="sequence length for testing")
 
 args = parser.parse_args()
 print("Hyperparameters:\n", args)
@@ -46,39 +33,10 @@ as well as long sequences (250+) just to see the difference
 in its ability to generalize.
 """
 
-# Parse hyperparameters.
-vocab_size = args.vocab_size
-# num_hidden_units = args.num_hidden_units   # start off with 500, try 300 too
-
-# LR = args.lr
-# opt = args.opt
-
 batch_size = args.batch_size
 no_of_epochs = args.epochs
+vocab_size = args.vocab_size
 
-# sequence_lengths = [args.seq_len_train, args.seq_len_test]
-
-
-# Load training data
-# x_train = []
-# with io.open('../preprocessed_data/imdb_train.txt','r',encoding='utf-8') as f:
-#     lines = f.readlines()
-
-# for line in lines:
-#     line = line.strip()
-#     line = line.split(' ')
-#     line = np.asarray(line, dtype=np.int)
-
-#     line[line>vocab_size] = 0
-
-#     x_train.append(line)
-
-# # Only the first 25,000 are labeled
-# x_train = x_train[0:25000]
-
-# # The first 125000 are labeled 1 for positive and the last 12500 are labeled 0 for negative
-# y_train = np.zeros((25000,))
-# y_train[0:12500] = 1
 
 print("==> Loading data and model...")
 
@@ -104,18 +62,8 @@ vocab_size += 1
 model = torch.load('rnn.model')
 model.cuda()
 
-# if opt == 'adam':
-#     optimizer = optim.Adam(model.parameters(), lr=LR)
-# elif opt=='sgd' :
-#     optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
-
-# L_Y_train = len(y_train)
 L_Y_test = len(y_test)
 
-# model.train()
-
-# train_loss = []
-# train_accu = []
 test_accu = []
 
 print("==> Start testing...")

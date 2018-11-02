@@ -34,12 +34,17 @@ parser.add_argument("--optimizer", default='adam', const='adam', nargs='?',
 args = parser.parse_args()
 print("Hyperparameters:\n", args)
 
+"""
+Make an overfit: more hidden units
+Make an underfit: less hidden units (try 300)
+"""
+
 # Parse hyperparameters.
 vocab_size = args.vocab_size
 num_hidden_units = args.num_hidden_units  # also try 300
 
 LR = args.lr
-opt = args.opt
+opt = args.optimizer
 batch_size = args.batch_size
 no_of_epochs = args.epochs
 

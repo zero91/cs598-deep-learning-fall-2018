@@ -31,6 +31,12 @@ parser.add_argument("--optimizer", default='adam', const='adam', nargs='?',
                     choices=['adam', 'sgd'],
                     help="dimension of embedded feature")                    
 
+"""
+Make an overfit: more hidden units
+Make an underfit: less hidden units
+or change from Adam to SGD
+"""
+
 args = parser.parse_args()
 print("Hyperparameters:\n", args)
 
@@ -39,7 +45,7 @@ vocab_size = args.vocab_size
 num_hidden_units = args.num_hidden_units
 
 LR = args.lr
-opt = args.opt
+opt = args.optimizer
 batch_size = args.batch_size
 no_of_epochs = args.epochs
 
