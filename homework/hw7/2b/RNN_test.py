@@ -40,11 +40,11 @@ vocab_size = args.vocab_size
 
 print("==> Loading data and model...")
 
-# Load testing data
-x_test = []
-with io.open('../preprocessed_data/imdb_test.txt','r',encoding='utf-8') as f:
-    lines = f.readlines()
+glove_embeddings = np.load('../preprocessed_data/glove_embeddings.npy')
 
+x_test = []
+with io.open('../preprocessed_data/imdb_test_glove.txt','r',encoding='utf-8') as f:
+    lines = f.readlines()
 for line in lines:
     line = line.strip()
     line = line.split(' ')
@@ -53,7 +53,6 @@ for line in lines:
     line[line>vocab_size] = 0
 
     x_test.append(line)
-
 y_test = np.zeros((25000,))
 y_test[0:12500] = 1
 
@@ -91,7 +90,7 @@ for epoch in range(no_of_epochs):
         # sequence_length = sequence_lengths[1]
         sequence_length = (epoch + 1) * 50
 
-        x_input = np.zeros((batch_size, sequence_length), dtype=np.int)
+        x_input = np.zeros((batch_size,sequence_length),dtype=np.int)
         for j in range(batch_size):
             x = np.asarray(x_input2[j])
             sl = x.shape[0]
@@ -100,9 +99,10 @@ for epoch in range(no_of_epochs):
             else:
                 start_index = np.random.randint(sl-sequence_length+1)
                 x_input[j,:] = x[start_index:(start_index+sequence_length)]
+        x_input = glove_embeddings[x_input]
         y_input = y_test[I_permutation[i:i+batch_size]]
 
-        data = Variable(torch.LongTensor(x_input)).cuda()
+        data = Variable(torch.FloatTensor(x_input)).cuda()
         target = Variable(torch.FloatTensor(y_input)).cuda()
 
         with torch.no_grad():
