@@ -14,7 +14,7 @@ import argparse
 
 from RNN_model import RNN_model
 
-parser = argparse.ArgumentParser(description="1a - BOW Sentiment Analysis")
+parser = argparse.ArgumentParser(description="2b - RNN Sentiment Analysis with Glove Embedding")
 
 # Hyperparameters.
 parser.add_argument("--lr", default=0.001, type=float, 
