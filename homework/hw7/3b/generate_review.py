@@ -23,6 +23,10 @@ parser.add_argument("--temperature", default=1.0, type=float,
 args = parser.parse_args()
 print("Arguments:\n", args)
 
+"""
+temperature 1.0, 1.3, 0.25, 0.5
+"""
+
 # ---------------------
 # Generate fake reviews
 # ---------------------

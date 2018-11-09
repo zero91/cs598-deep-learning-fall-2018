@@ -50,7 +50,7 @@ vocab_size = args.vocab_size
 num_hidden_units = args.num_hidden_units   # start off with 500, try 300 too
 
 LR = args.lr
-opt = args.opt
+opt = args.optimizer
 batch_size = args.batch_size
 no_of_epochs = args.epochs
 
@@ -121,7 +121,15 @@ for epoch in range(no_of_epochs):
 
     if epoch == 50:
         for param_group in optimizer.param_groups:
-            param_group['lr'] = LR/10.0
+            param_group['lr'] = LR / 10.0
+    
+    # Avoid the overflow problem of Adam
+    if opt == 'adam':
+        for group in optimizer.param_groups:
+            for p in group['params']:
+                state = optimizer.state[p]
+                if state['step'] >= 1024:
+                    state['step'] = 1000
 
     model.train()
 
@@ -231,7 +239,7 @@ for epoch in range(no_of_epochs):
         print("  ", "%.2f" % (epoch_acc*100.0), "%.4f" % epoch_loss, "%.4f" % float(time.time()-time1))
     torch.cuda.empty_cache()
 
-    if(((epoch+1)%2)==0):
+    if (epoch + 1) % 2 == 0:
         torch.save(model,'temp.model')
         torch.save(optimizer,'temp.state')
         data = [train_loss,train_accu,test_accu]
