@@ -6,15 +6,18 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torch.distributed as dist
 
+from RNN_language_model import RNN_language_model
+
 import time
 import os
 import sys
 import io
+
 import argparse
+def str2bool(v):
+    return v.lower() in ("yes", "true", "t", "1")
 
-from RNN_language_model import RNN_language_model
-
-parser = argparse.ArgumentParser(description="1a - BOW Sentiment Analysis")
+parser = argparse.ArgumentParser(description="3a - Train Language Model")
 
 # Hyperparameters.
 parser.add_argument("--lr", default=0.001, type=float, 
@@ -34,6 +37,8 @@ parser.add_argument("--seq_len_train", default=50, type=int,
                     help="sequence length for training")                
 parser.add_argument("--seq_len_test", default=100, type=int,
                     help="sequence length for testing")
+parser.add_argument("--resume", default=False, type=str2bool,
+                    help="resume training from the trained checkpoint")
 
 args = parser.parse_args()
 print("Hyperparameters:\n", args)
@@ -98,13 +103,21 @@ y_test[0:12500] = 1
 
 vocab_size += 1
 
-model = RNN_language_model(vocab_size, num_hidden_units)
-model.cuda()
+if args.resume:
+    print("Loading model from checkpoint...")
+    model = torch.load('temp.model')
+    model.cuda()
+    optimizer = torch.load('temp.state')
+else:
+    # Init model.
+    model = RNN_language_model(vocab_size, num_hidden_units)
+    model.cuda()
 
-if opt == 'adam':
-    optimizer = optim.Adam(model.parameters(), lr=LR)
-elif opt=='sgd' :
-    optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
+    # Init optimizer.
+    if opt == 'adam':
+        optimizer = optim.Adam(model.parameters(), lr=LR)
+    elif opt=='sgd' :
+        optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
 
 L_Y_train = len(y_train)
 L_Y_test = len(y_test)
@@ -128,7 +141,7 @@ for epoch in range(no_of_epochs):
         for group in optimizer.param_groups:
             for p in group['params']:
                 state = optimizer.state[p]
-                if state['step'] >= 1024:
+                if 'step' in state and state['step'] >= 1024:
                     state['step'] = 1000
 
     model.train()

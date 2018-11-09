@@ -30,9 +30,6 @@ parser.add_argument("--max_features", default=False, type=str2bool,
 
 args = parser.parse_args()
 
-"""
-python3.6 --perturb_images False --max_classification_output False --max_features True
-"""
 
 def plot(samples):
     fig = plt.figure(figsize=(10, 10))

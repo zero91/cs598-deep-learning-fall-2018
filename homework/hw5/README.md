@@ -63,6 +63,7 @@ Use pretrained **ResNet50** model as the identical networks (Q,P,N). The model i
 
 
 <div style="page-break-after: always;"></div>
+
 ## Sampling
 
 > Sample 5 different images from the validation set (each from a different class)
