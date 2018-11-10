@@ -13,6 +13,7 @@ import io
 import argparse
 
 from RNN_model import RNN_model
+from RNN_language_model import RNN_language_model
 
 parser = argparse.ArgumentParser(description="2a - RNN Sentiment Analysis")
 
@@ -101,9 +102,7 @@ vocab_size += 1
 # model = RNN_model(vocab_size, num_hidden_units)
 # model.cuda()
 model = RNN_model(vocab_size, num_hidden_units)
-
-# language_model = torch.load('language.model')
-language_model = torch.load('../3a/language.model')
+language_model = torch.load('language.model')
 
 # Copy the weights for the embedding and LSTM layers from the language model
 model.embedding.load_state_dict(language_model.embedding.state_dict())

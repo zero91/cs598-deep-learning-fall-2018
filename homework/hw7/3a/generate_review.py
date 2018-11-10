@@ -37,7 +37,7 @@ vocab_size = 8000 + 1
 word_to_id = {token: idx for idx, token in enumerate(imdb_dictionary)}
 
 # Load the trained language model from part 3a and set it to eval() mode.
-model = torch.load('../3a/language.model')
+model = torch.load('language.model')
 print('model loaded...')
 model.cuda()
 
@@ -103,7 +103,8 @@ for j in range(length_of_review):
     ## predict the next word
     embed = model.embedding(x)
 
-    h = model.lstm1(embed)
+    # h = model.lstm1(embed)
+    h = model.lstm1(embed[:,0,:])
     h = model.bn_lstm1(h)
     h = model.dropout1(h,dropout=0.3,train=False)
 
