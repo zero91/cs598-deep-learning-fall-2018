@@ -43,12 +43,6 @@ parser.add_argument("--resume", default=False, type=str2bool,
 args = parser.parse_args()
 print("Hyperparameters:\n", args)
 
-"""
-I’d suggest trying to train a model on short sequences (50 or less) 
-as well as long sequences (250+) just to see the difference 
-in its ability to generalize.
-Also try different hidden units
-"""
 
 # Parse hyperparameters.
 vocab_size = args.vocab_size
