@@ -103,26 +103,26 @@ for i in range(len(test[0])):
     nFrames = len(h['video'])
 
     # data = np.zeros((nFrames,3,IMAGE_SIZE,IMAGE_SIZE),dtype=np.float32)
-    num_sequence = nFrames - num_of_frames + 1
+    num_sequence = nFrames // num_of_frames
     data = np.zeros(
         (num_sequence, 3, num_of_frames, IMAGE_SIZE, IMAGE_SIZE),
         dtype=np.float32
     )
 
     for j in range(num_sequence):
-        for k in range(j, j + num_of_frames):
+        for k in range(j * num_of_frames, (j + 1) * num_of_frames):
             frame = h['video'][k]
             frame = frame.astype(np.float32)
             frame = cv2.resize(frame,(IMAGE_SIZE,IMAGE_SIZE))
             frame = frame/255.0
             frame = (frame - mean)/std
             frame = frame.transpose(2,0,1)
-            data[j, :, k - j, :, :] = frame
+            data[j, :, k - j * num_of_frames, :, :] = frame
     h.close()
 
-    prediction = np.zeros((num_sequence, NUM_CLASSES),dtype=np.float32)
+    prediction = np.zeros((num_sequence, NUM_CLASSES), dtype=np.float32)
 
-    loop_i = list(range(0, num_sequence, 50))
+    loop_i = list(range(0, num_sequence, 10))
     loop_i.append(num_sequence)
 
     for j in range(len(loop_i)-1):
@@ -165,7 +165,7 @@ for i in range(len(test[0])):
         prediction[j] = np.exp(prediction[j])/np.sum(np.exp(prediction[j]))
 
     # create a vector of prob of classfying this video into each class
-    prediction = np.sum(np.log(prediction), axis=0)   # sum all rows (all frames)
+    prediction = np.sum(np.log(prediction), axis=0)   # sum all rows (all sequences)
     argsort_pred = np.argsort(-prediction)[0:10]   # sort from large to small
 
     label = test[1][index]
