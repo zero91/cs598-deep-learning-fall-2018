@@ -1,42 +1,3 @@
-"""
-Once again, we can achieve better performance on the test dataset 
-by using the full video instead of just 16 frames. 
-Use the code provided in part 1 for testing as a starting point 
-to create similar code for testing the 3D ResNet on the full video 
-sequences. There can be a couple of approaches.
-
-* Process subsequences of length 16 and average the final output. 
-This is the most basic way and easiest to implement but not the best way. 
-Notice there is a difference between processing every 16 frames 
-compared with processing every subsequence of length 16. 
-There are overlapping subsequences. 
-If you are unsure of how to do the next option, 
-it may be smart to start here just to get something working to see 
-what to expect.
-
-* Pass the full sequence in as input. 
-When we defined the model, we set sample_duration=16. 
-This is the minimum length for training but not the max length. 
-With 16 frames, the temporal dimension has been reduced to size 1. 
-That is, the output after model.layer4[0] is [batch_size,2048,1,7,7] 
-where 2048 is the number of channels, 1 is the temporal dimension, 
-and 7x7 is the spatial dimension. 
-By specifying sample_duration=16, model.avgpool() is created with 
-the knowledge that average pooling will need to be performed over 
-the 1x7x7 dimensions. If a sequence of length 32 was passed into 
-the network, the output of model.layer4[0] would be [batch_size,2048,2,7,7]. 
-If average pooling is performed over the 2x7x7 dimensions, 
-then this can be passed through the model.fc layer to get a single 
-prediction for the entire sequence of length 32. 
-For each video, perform the appropriately sized averaging pooling 
-such that the full sequence can be passed through the network. 
-You may want to look at the model definition resnet_3d.py for ideas.
-
-Save the output for each video 
-(this should be a single prediction as opposed to a 
-prediction for each frame). Also save the confusion matrix.
-"""
-
 import numpy as np
 import os
 import sys
@@ -122,7 +83,7 @@ for i in range(len(test[0])):
 
     prediction = np.zeros((num_sequence, NUM_CLASSES), dtype=np.float32)
 
-    loop_i = list(range(0, num_sequence, 10))
+    loop_i = list(range(0, num_sequence, 5))
     loop_i.append(num_sequence)
 
     for j in range(len(loop_i)-1):

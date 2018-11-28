@@ -128,7 +128,7 @@ sorted_results = results[indices]
 
 for i in range(NUM_CLASSES):
     # 1. name of a class, 
-    # 2. num of samples of this class being classfied correctly, 
+    # 2. percent of samples of this class being classfied correctly, 
     # 3. total num of samples classfied as this class
     print(sorted_list[i],sorted_results[i],number_of_examples[indices[i]])
 

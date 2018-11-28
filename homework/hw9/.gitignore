@@ -2,3 +2,5 @@ remote/
 code_ziyuz2.zip
 report_ziyuz2.pdf
 NLP.xlsx
+*.ipynb
+*.npy
