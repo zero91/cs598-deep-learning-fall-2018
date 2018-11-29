@@ -19,12 +19,16 @@
 |                    | Top 1 Accuracy | Top 5 Accuracy | Top 10 Accuracy |
 | ------------------ | -------------- | -------------- | --------------- |
 | Single-frame model | 0.779540       | 0.945282       | 0.979381        |
-| 3D model           |                |                |                 |
+| 3D model           | 0.833466       | 0.970923       | 0.984404        |
 | Combined model     |                |                |                 |
 
 
 
 ## Best/Worst Performing Classes
+
+> Report 10 pairs of classes which are the off-diagonal elements (most confused)
+>
+> Report 10 high performing classes and 10 poor performing classes (max and min of the diagonal elements)
 
 Class with highest performance should be a class with most samples being classified correctly. Conversely, class with lowest performance should be a class with least samples being classified correctly.
 
@@ -33,7 +37,7 @@ Note that the value in the parentheses shows the probability of a particular cla
 |                    | 10 Classes with the Highest Performance                      | 10 Classes with the Lowest Performance                       |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Single-frame model | Rowing (1.0),  Surfing (1.0), BasketballDunk (1.0), Billiards(1.0), PlayingDaf (1.0), PlayingTabla (1.0), HorseRace (1.0), RockClimbingIndoor (1.0), FrisbeeCatch (1.0), Skijet (1.0) | JumpRope (0.03), BodyWeightSquats (0.07), YoYo (0.19), JumpingJack (0.22), HandstandWalking (0.23), Shotput (0.28), HighJump (0.32), Nunchucks (0.4), CricketShot (0.43), BrushingTeeth (0.44) |
-| 3D model           |                                                              |                                                              |
+| 3D model           | Drumming (1.0), JumpRope (1.0), Fencing (1.0), HorseRiding (1.0), PoleVault (1.0), PlayingViolin (1.0), PlayingTabla (1.0), PlayingPiano (1.0), PlayingGuitar (1.0), BoxingSpeedBag (1.0) | CricketShot (0.22), HandstandWalking (0.29),  Lunges (0.30), HighJump (0.35), Nunchucks (0.37), YoYo (0.47), FrontCrawl (0.49), SoccerJuggling (0.51), ApplyLipstick (0.53), PommelHorse (0.54) |
 | Combined model     |                                                              |                                                              |
 
 
@@ -42,7 +46,7 @@ Note that the value in the parentheses shows the probability of a particular cla
 
 |                    | 10 Most Confused Classes |
 | ------------------ | ------------------------ |
-| Single-frame model |                          |
-| 3D model           |                          |
+| Single-frame model |  <ul><li>('BrushingTeeth', 'ShavingBeard')</li><li>('ApplyEyeMakeup', 'ApplyLipstick')</li> <li>('HighJump', 'JavelinThrow')</li> <li>('FrontCrawl', 'BreastStroke')</li> <li>('BodyWeightSquats', 'Lunges')</li> <li>('JumpRope', 'HulaHoop')</li> <li>('CricketShot', 'CricketBowling')</li> <li>('Shotput', 'ThrowDiscus')</li> <li>('Haircut', 'BlowDryHair')</li> <li>('Hammering', 'HeadMassage')</li></ul>|
+| 3D model           |   <ul><li>('CricketShot', 'CricketBowling')</li> <li>('FrontCrawl', 'BreastStroke')</li> <li>('Haircut', 'BlowDryHair')</li> <li>('PommelHorse', 'ParallelBars')</li> <li>('Kayaking', 'Rafting')</li> <li>('ApplyLipstick', 'ApplyEyeMakeup')</li> <li>('HammerThrow', 'ThrowDiscus')</li> <li>('Lunges', 'FloorGymnastics')</li> <li>('BrushingTeeth', 'ApplyEyeMakeup')</li> <li>('HighJump', 'PoleVault')</li></ul> |
 | Combined model     |                          |
 

@@ -49,6 +49,8 @@ mean = np.asarray([0.485, 0.456, 0.406],np.float32)
 std = np.asarray([0.229, 0.224, 0.225],np.float32)
 model.eval()
 
+all_prediction = np.zeros((len(test[0]), NUM_CLASSES), dtype=np.float32)
+
 for i in range(len(test[0])):
 
     t1 = time.time()
@@ -100,8 +102,11 @@ for i in range(len(test[0])):
         prediction[j] = np.exp(prediction[j])/np.sum(np.exp(prediction[j]))
 
     # create a vector of prob of classfying this video into each class
-    prediction = np.sum(np.log(prediction),axis=0)   # sum all rows (all frames)
+    prediction = np.sum(np.log(prediction), axis=0)   # sum all rows (all frames)
     argsort_pred = np.argsort(-prediction)[0:10]   # sort from large to small
+
+    # add the prediction of the current video
+    all_prediction[index, :] = prediction / nFrames
 
     label = test[1][index]
     confusion_matrix[label,argsort_pred[0]] += 1
@@ -132,4 +137,5 @@ for i in range(NUM_CLASSES):
     # 3. total num of samples classfied as this class
     print(sorted_list[i],sorted_results[i],number_of_examples[indices[i]])
 
-np.save('single_frame_confusion_matrix.npy',confusion_matrix)
+np.save('single_frame_confusion_matrix.npy', confusion_matrix)
+np.save('single_frame_prediction_matrix.npy', all_prediction)
