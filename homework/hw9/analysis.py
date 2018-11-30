@@ -81,16 +81,17 @@ if __name__ == '__main__':
     data_directory = '/projects/training/bauh/AR/'
     class_list, train, test = getUCF101(base_directory = data_directory)
 
-    # # Single frame model
-    # confusion_matrix_single = np.load("single_frame_confusion_matrix.npy")
-    # top_single = get_most_confused_classes(confusion_matrix_single, class_list)
-    # print("==> Top 10 for single frame model: \n", top_single)
+    # Single frame model
+    confusion_matrix_single = np.load("single_frame_confusion_matrix.npy")
+    top_single = get_most_confused_classes(confusion_matrix_single, class_list)
+    print("==> Top 10 for single frame model: \n", top_single)
 
-    # # 3D model
-    # confusion_matrix_3d = np.load("3d_conv_confusion_matrix.npy")
-    # top_3d = get_most_confused_classes(confusion_matrix_3d, class_list)
-    # print("==> Top 10 for 3D model: \n", top_3d)
+    # 3D model
+    confusion_matrix_3d = np.load("3d_conv_confusion_matrix.npy")
+    top_3d = get_most_confused_classes(confusion_matrix_3d, class_list)
+    print("==> Top 10 for 3D model: \n", top_3d)
 
+    # Combined model
     combine_model_analysis(
         'single_frame_prediction_matrix.npy',
         '3d_conv_prediction_matrix.npy',
