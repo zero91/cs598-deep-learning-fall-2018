@@ -1,1 +1,1 @@
-3a and 3b should be the next HW
+This foler contains codes for both HW7 and HW8.
