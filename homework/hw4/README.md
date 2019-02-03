@@ -1,8 +1,7 @@
 ------
 # Fall 2018 IE534/CS598:  HW4
 
-**Name**: Ziyu Zhou, 
-**NetID**: ziyuz2
+**Author**: Ziyu Zhou
 
 ------
 
@@ -12,23 +11,7 @@
 >
 > * Fine-tune a pre-trained ResNet-18 model and achieve at least 70% test accuracy.
 
-<!-- TOC -->
-**Table of Contents:**
-
-- [Fall 2018 IE534/CS598:  HW4](#fall-2018-ie534cs598--hw4)
-    - [Part I: Build the required Residual Network](#part-i-build-the-required-residual-network)
-        - [Test accuracy](#test-accuracy)
-        - [Hyperparameters](#hyperparameters)
-        - [Model Architecture](#model-architecture)
-    - [Part II: Fine-tune a pre-trained ResNet-18 model](#part-ii-fine-tune-a-pre-trained-resnet-18-model)
-        - [Test accuracy](#test-accuracy-1)
-        - [Hyperparameters](#hyperparameters-1)
-    - [Usage](#usage)
-        - [Run the program](#run-the-program)
-        - [Configurations](#configurations)
-    - [Implementation](#implementation)
-
-<!-- /TOC -->
+<!-- TOC -->autoauto- [Fall 2018 IE534/CS598:  HW4](#fall-2018-ie534cs598--hw4)auto    - [Part I: Build the required Residual Network](#part-i-build-the-required-residual-network)auto        - [Test accuracy](#test-accuracy)auto        - [Hyperparameters](#hyperparameters)auto        - [Model Architecture](#model-architecture)auto    - [Part II: Fine-tune a pre-trained ResNet-18 model](#part-ii-fine-tune-a-pre-trained-resnet-18-model)auto        - [Test accuracy](#test-accuracy-1)auto        - [Hyperparameters](#hyperparameters-1)auto    - [Usage](#usage)auto        - [Run the program](#run-the-program)auto        - [Configurations](#configurations)auto    - [Implementation](#implementation)autoauto<!-- /TOC -->
 
 
 ## Part I: Build the required Residual Network
